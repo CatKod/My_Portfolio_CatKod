@@ -1,0 +1,13 @@
+{
+  "name": "my-portfolio-catkod",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Multi-language (VI / EN / ja) personal portfolio site.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "verify:export": "node scripts/verify-export.mjs"
+  }
+}
