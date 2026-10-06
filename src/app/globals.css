@@ -510,18 +510,24 @@ button {
   letter-spacing: -0.01em;
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: flex-end;
   gap: 10px;
   margin-bottom: 18px;
 }
 
+.rotating-text {
+  display: inline-flex;
+  align-items: flex-end;
+  white-space: nowrap;
+}
 .rotating-text-window {
   position: relative;
   display: inline-flex;
+  align-items: flex-end;
   min-width: 240px;
   height: 1.1em;
   overflow: hidden;
-  vertical-align: bottom;
+  line-height: 1.1;
 }
 .rotating-text-phrase {
   position: absolute;
