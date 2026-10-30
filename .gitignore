@@ -1,0 +1,25 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+*.err
+
+# REA / verification artifacts
+shots/
+.chrome-rea*/
+.cap.json
+p_local.json
+p_up.json
+region_*.json
