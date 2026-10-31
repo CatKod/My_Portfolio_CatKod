@@ -6,7 +6,7 @@
 /** Ánh xạ chuỗi cũ -> mới, dùng cho cả hai lớp dữ liệu. */
 export const commonReplacements = [
   // --- tên và thương hiệu ---
-  ['https://irfansabrian.vercel.app', 'https://catkod.github.io/'],
+  ['https://irfansabrian.vercel.app', 'https://catkod.github.io/CatKod/'],
   ['https://www.linkedin.com/in/irfan-sabrian-b1a320372/', 'https://www.linkedin.com/in/kim-v%C4%A9nh-ho%C3%A0ng-9a306935a/'],
   ['https://github.com/IrfanSabrian', 'https://github.com/CatKod'],
   ['https://instagram.com/irf.shyonn', 'https://web.facebook.com/HoangKiVinh'],
