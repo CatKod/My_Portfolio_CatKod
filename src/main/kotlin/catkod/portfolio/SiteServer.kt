@@ -11,18 +11,20 @@ import java.util.concurrent.Executors
  * HTTP server của trang portfolio.
  *
  * Luồng xử lý:
- *  1. Các trang có dữ liệu sống (ví dụ `/about` với biểu đồ GitHub) được lấy trực
- *     tiếp từ site gốc, có cache ngắn để tránh dồn tải.
- *  2. Các yêu cầu RSC của Next.js (`?_rsc=...`, header `RSC: 1`) và mọi yêu cầu
- *     động khác được chuyển tiếp nguyên vẹn về site gốc, nhờ vậy hành vi runtime
- *     (điều hướng client-side, prefetch, dữ liệu trang) khớp hoàn toàn bản gốc.
- *  3. Tài nguyên tĩnh trong `site/` được phục vụ trực tiếp — chúng đã được đối chiếu
- *     byte-for-byte với bản gốc.
+ *  1. Yêu cầu RSC của Next.js (`?_rsc=...`, header `RSC: 1`) được phục vụ từ
+ *     payload flight trích sẵn trong các tệp HTML của `site/`. Bản dựng lại đã
+ *     đổi nội dung nên payload phải đến từ bản local — chuyển tiếp lên site gốc
+ *     sẽ khiến React so DOM với cây component của bản gốc và báo hydration
+ *     mismatch (`Minified React error #418`).
+ *  2. Tài nguyên tĩnh trong `site/` được phục vụ trực tiếp.
+ *  3. Mọi yêu cầu còn lại được chuyển tiếp về site gốc (fallback), giữ nguyên
+ *     header + query + body.
  */
 class SiteServer(
     private val staticFiles: StaticFiles,
     private val proxy: UpstreamProxy,
     private val livePages: LivePages,
+    private val rscPayloads: RscPayloads,
     private val options: Options,
 ) {
     private lateinit var server: HttpServer
@@ -45,10 +47,12 @@ class SiteServer(
             val query = exchange.requestURI.rawQuery
 
             if (method == "GET" || method == "HEAD") {
-                val live = serveLivePage(exchange, rawPath, query)
-                if (live) return
+                if (isRscRequest(exchange, query)) {
+                    if (serveRscPayload(exchange, rawPath)) return
+                } else {
+                    val live = serveLivePage(exchange, rawPath, query)
+                    if (live) return
 
-                if (!isRscRequest(exchange, query)) {
                     val file = staticFiles.resolve(rawPath)
                     if (file != null) {
                         serveFile(exchange, file)
@@ -72,6 +76,24 @@ class SiteServer(
         } finally {
             exchange.close()
         }
+    }
+
+    /**
+     * Phục vụ payload flight của route từ tệp HTML tĩnh cục bộ.
+     * Trả về true nếu tìm thấy payload.
+     */
+    private fun serveRscPayload(exchange: HttpExchange, rawPath: String): Boolean {
+        val payload = rscPayloads.payload(rawPath) ?: return false
+        exchange.responseHeaders.set("Content-Type", "text/x-component")
+        exchange.responseHeaders.set("Vary", "RSC, Next-Router-State-Tree, Next-Router-Prefetch")
+        exchange.responseHeaders.set("Cache-Control", "no-store")
+        if (exchange.requestMethod == "HEAD") {
+            exchange.sendResponseHeaders(200, -1)
+            return true
+        }
+        exchange.sendResponseHeaders(200, payload.size.toLong())
+        exchange.responseBody.use { it.write(payload) }
+        return true
     }
 
     /**
@@ -111,8 +133,6 @@ class SiteServer(
 
     /**
      * Nhận diện yêu cầu RSC của Next.js App Router.
-     * Yêu cầu này mang dữ liệu điều hướng phía server, không thể phục vụ từ
-     * tệp tĩnh nên phải chuyển tiếp về bản gốc.
      */
     private fun isRscRequest(exchange: HttpExchange, query: String?): Boolean {
         if (query != null && (query.contains("_rsc=") || query.contains("__flight"))) return true

@@ -1,25 +1,26 @@
-# Gradle
-.gradle/
+# Artifact tạm trong quá trình rebrand / phân tích
+*.flight.raw
+*.flight.txt
+rsc_*.txt
+text_*.txt
+tmp_*.html
+tmpl_*.html
+gh_catkod.html
+
+# Bản gốc (site của Irfan Sabrian) chỉ dùng làm nguồn cho script rebrand
+site.orig.bak/
+
+# Profile trình duyệt dùng cho REA
+.chrome-rea/
+.chrome-rea2/
+
+# Output của Gradle / công cụ
 build/
-!gradle/wrapper/gradle-wrapper.jar
-
-# IDE
-.idea/
-*.iml
-.vscode/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-*.err
-
-# REA / verification artifacts
+.gradle/
+.kotlin/
 shots/
-.chrome-rea*/
-.cap.json
-p_local.json
-p_up.json
-region_*.json
+
+# Output của các script dò trong tools/
+tools/*.txt
+tools/*.html
+tools/*.json

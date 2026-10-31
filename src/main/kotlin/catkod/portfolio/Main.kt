@@ -8,10 +8,11 @@ import kotlin.system.exitProcess
  *
  * Kiến trúc:
  *  - [StaticFiles] phục vụ nội dung tĩnh đã đối chiếu byte-for-byte với bản gốc.
+ *  - [RscPayloads] trích payload flight từ các tệp HTML của `site/` để phục vụ
+ *    yêu cầu RSC, giữ cho DOM và cây component khớp nhau (không hydration mismatch).
  *  - [LivePages] đánh dấu các trang có dữ liệu sống (biểu đồ GitHub) để lấy
  *    trực tiếp từ site gốc.
- *  - [UpstreamProxy] chuyển tiếp các yêu cầu động (RSC payload, prefetch, API)
- *    về bản gốc để hành vi runtime giống hệt.
+ *  - [UpstreamProxy] chuyển tiếp các yêu cầu động (prefetch, API) về bản gốc.
  *
  * Mọi logic nằm bằng Kotlin thuần, chỉ dùng JDK (com.sun.net.httpserver + java.net.http).
  */
@@ -27,7 +28,8 @@ fun main(args: Array<String>) {
     val staticFiles = StaticFiles(siteRoot)
     val proxy = UpstreamProxy(options.upstream)
     val livePages = LivePages(options.livePaths)
-    val server = SiteServer(staticFiles, proxy, livePages, options)
+    val rscPayloads = RscPayloads(siteRoot)
+    val server = SiteServer(staticFiles, proxy, livePages, rscPayloads, options)
 
     Runtime.getRuntime().addShutdownHook(Thread { server.stop(0) })
     server.start()

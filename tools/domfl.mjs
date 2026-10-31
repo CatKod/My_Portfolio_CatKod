@@ -1,0 +1,25 @@
+import { readFileSync } from 'node:fs';
+
+const file = process.argv[2];
+const s = readFileSync(file, 'utf8');
+const flightRe = /self\.__next_f\.push\(\[1,"(?:[^"\\]|\\.)*"\]\)/g;
+let flight = '';
+let dom = '';
+let last = 0;
+for (const m of s.matchAll(flightRe)) {
+  dom += s.slice(last, m.index);
+  last = m.index + m[0].length;
+  const b = m[0].slice(m[0].indexOf(',"') + 2, m[0].lastIndexOf('"'));
+  try {
+    flight += JSON.parse('"' + b + '"');
+  } catch {
+    /* ignore */
+  }
+}
+dom += s.slice(last);
+
+const needles = process.argv.slice(3);
+for (const n of needles) {
+  const c = (t, x) => (t.split(x).length - 1);
+  console.log(n.padEnd(34), 'dom', c(dom, n), 'fl', c(flight, n));
+}

@@ -17,7 +17,7 @@ data class Options(
     val host: String = "0.0.0.0",
     val siteRoot: String = "site",
     val upstream: String = "https://irfansabrian.vercel.app",
-    val livePaths: Set<String> = setOf("/about"),
+    val livePaths: Set<String> = emptySet(),
     val liveCacheMillis: Long = 60_000,
     val verbose: Boolean = false,
 ) {
