@@ -14,7 +14,7 @@ export const profile = {
   roleTitle: 'Embedded firmware engineer.',
   tagline: 'firmware + edge AI',
   domain: 'catkod.github.io',
-  url: 'https://catkod.github.io/CatKod/',
+  url: 'https://catkod.github.io/',
   email: 'kimvinhh6@gmail.com',
   phone: '+84337951905',
   location: 'Hanoi, Vietnam',
@@ -29,7 +29,7 @@ export const profile = {
     facebook: 'https://web.facebook.com/HoangKiVinh',
     discord: 'https://discord.com/users/708991627003166743',
     jlpt: 'https://www.jlpt.jp/',
-    website: 'https://catkod.github.io/CatKod/',
+    website: 'https://catkod.github.io/',
   },
 
   cvPath: '/pdf/CV_Hoang-Kim-Vinh_2026.pdf',
