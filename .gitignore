@@ -30,3 +30,14 @@ tmp_*_tree.txt
 
 # Dependency của script kiểm thử (playwright)
 node_modules/
+
+# Bản deploy dựng cho GitHub Pages — sinh ra từ site/ bởi tools/prepareDeploy.mjs,
+# đã được publish sang repo CatKod/CatKod.github.io nên không cần track ở đây.
+deploy/
+
+# Output tạm của script dò GitHub repo
+tmp_repos.json
+
+# Script dò một lần, chỉ dùng trong lúc điều tra (không tái sử dụng được)
+tools/cvfind.mjs
+tools/rscfind.mjs

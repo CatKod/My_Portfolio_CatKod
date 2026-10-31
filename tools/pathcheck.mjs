@@ -1,0 +1,15 @@
+import fs from 'fs';
+const file = process.argv[2];
+const h = fs.readFileSync(file, 'utf8');
+const set = new Set();
+for (const m of h.matchAll(/["'(]\/_next\/[^"')]+/g)) set.add(m[0]);
+console.log('_next refs:');
+for (const s of [...set].slice(0, 8)) console.log('  ', s);
+const s2 = new Set();
+for (const m of h.matchAll(/src="([^"]+)"/g)) s2.add(m[1]);
+console.log('img srcs:');
+for (const s of [...s2].slice(0, 8)) console.log('  ', s);
+const s3 = new Set();
+for (const m of h.matchAll(/href="(\/[^"]*)"/g)) s3.add(m[1]);
+console.log('root hrefs:');
+for (const s of [...s3].slice(0, 12)) console.log('  ', s);
