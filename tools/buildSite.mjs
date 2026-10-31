@@ -55,12 +55,13 @@ step('1/7 reset chunk về bản gốc', () => {
   console.log('đã khôi phục chunk gốc');
 });
 
-step('2/5 rebrand (HTML + DOM + flight + chunk)', () => run('rebrand.mjs'));
-step('3/5 patch credential link (client bundle)', () => run('patchCredLink.mjs'));
-step('4/5 đồng bộ icon map client', () => run('synciconmap.mjs'));
-step('5/5 đổi tên chunk đã sửa', () => run('renameChunks.mjs'));
-step('6/6 dọn chunk cũ', () => run('pruneChunks.mjs'));
-step('7/7 sinh CV PDF', () => run('buildCv.mjs'));
+step('2/8 rebrand (HTML + DOM + flight + chunk)', () => run('rebrand.mjs'));
+step('3/8 patch credential link (client bundle)', () => run('patchCredLink.mjs'));
+step('4/8 đồng bộ icon map client', () => run('synciconmap.mjs'));
+step('5/8 vá CSS (mất chữ trên desktop + thẻ ảnh chân dung)', () => run('patchCss.mjs'));
+step('6/8 đổi tên chunk đã sửa', () => run('renameChunks.mjs'));
+step('7/8 dọn chunk cũ', () => run('pruneChunks.mjs'));
+step('8/8 sinh CV PDF', () => run('buildCv.mjs'));
 
 console.log('\nHoàn tất. Chạy lại server:');
 console.log('  java -jar build/libs/portfolio-kt.jar --port=9310 --root=site');

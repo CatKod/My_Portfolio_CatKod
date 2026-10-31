@@ -1,14 +1,18 @@
-import { readFileSync, readdirSync } from 'node:fs';
-import path from 'node:path';
+import fs from 'fs';
+import path from 'path';
 
 const dir = 'site/_next/static/chunks';
-const needle = process.argv[2];
-const ctx = Number(process.argv[3] || 300);
-for (const f of readdirSync(dir)) {
+const needles = process.argv.slice(2);
+
+for (const f of fs.readdirSync(dir)) {
   if (!f.endsWith('.css')) continue;
-  const s = readFileSync(path.join(dir, f), 'utf8');
-  let i = s.indexOf(needle);
-  if (i === -1) continue;
-  console.log(`\n===== ${f} @${i} =====`);
-  console.log(s.slice(Math.max(0, i - ctx), Math.min(s.length, i + ctx)));
+  const s = fs.readFileSync(path.join(dir, f), 'utf8');
+  const ruleRe = /([^{}]+)\{([^{}]*)\}/g;
+  let m;
+  while ((m = ruleRe.exec(s))) {
+    const sel = m[1].trim();
+    if (!needles.some((n) => sel.includes(n))) continue;
+    console.log('[' + f + '] ' + sel + ' { ' + m[2] + ' }');
+    console.log();
+  }
 }

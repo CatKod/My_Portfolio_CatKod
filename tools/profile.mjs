@@ -83,6 +83,24 @@ export const about = {
     'I write production firmware for commercial DC fast-charging stations — CAN bus, MISRA C compliance, non-blocking state machines on STM32H7 — and build complete IoT products from PCB to mobile app.',
 };
 
+/**
+ * Thẻ ảnh chân dung (hàng thứ 3 của `.profile-brief` trên trang /about).
+ *
+ * Vị trí này hấp thụ đúng khoảng trống dọc 152px giữa cột trái (286px) và
+ * cột phải (438px) của `.profile-board` ở 1440x900. Nội dung và CSS do
+ * Gemini thiết kế theo brief (tools/brief-portrait.md).
+ */
+export const portrait = {
+  src: '/images/profile/portrait.webp',
+  alt: 'Hoàng Kim Vĩnh',
+  width: 64,
+  height: 80,
+  label: 'Profile photo',
+  name: 'Hoàng Kim Vĩnh',
+  role: 'Embedded firmware engineer',
+  meta: 'HUST 20235876 · Hanoi, Vietnam',
+};
+
 export const workHistory = [
   {
     year: '2026',

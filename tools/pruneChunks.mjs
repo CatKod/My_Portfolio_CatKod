@@ -12,7 +12,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync, unlinkSync } from
 import { join } from 'node:path';
 
 const dir = 'site/_next/static/chunks';
-const newFiles = readdirSync(dir).filter((f) => f.endsWith('.catkod.js'));
+const newFiles = readdirSync(dir).filter((f) => /\.catkod\.(js|css)$/.test(f));
 
 const all = [];
 (function walk(d) {
@@ -24,7 +24,7 @@ const all = [];
 })('site');
 
 for (const nf of newFiles) {
-  const old = nf.replace('.catkod.js', '.js');
+  const old = nf.replace(/\.catkod\.(js|css)$/, '.$1');
   const oldPath = join(dir, old);
   if (!existsSync(oldPath)) continue;
 

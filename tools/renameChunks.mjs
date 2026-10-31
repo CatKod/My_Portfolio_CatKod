@@ -13,7 +13,8 @@ import { readFileSync, writeFileSync, readdirSync, existsSync, copyFileSync } fr
 import { join } from 'node:path';
 
 const dir = 'site/_next/static/chunks';
-const files = readdirSync(dir).filter((f) => f.endsWith('.js'));
+// CSS cũng cần bust cache: sau khi vá rule, hash tên cũ không còn đúng.
+const files = readdirSync(dir).filter((f) => f.endsWith('.js') || f.endsWith('.css'));
 const origDir = 'site.orig.bak/_next/static/chunks';
 
 // Chunk nào đã bị sửa so với bản gốc?
@@ -31,8 +32,8 @@ if (!changed.length) {
 
 console.log('chunk đã sửa:', changed.join(', '));
 
-/** Tên mới: chèn hậu tố trước .js */
-const newName = (f) => f.replace(/\.js$/, '.catkod.js');
+/** Tên mới: chèn hậu tố trước phần mở rộng (.js / .css) */
+const newName = (f) => f.replace(/\.(js|css)$/, '.catkod.$1');
 
 // 1) Copy sang tên mới
 const renames = new Map();

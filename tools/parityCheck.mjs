@@ -10,7 +10,7 @@ import { chromium } from 'playwright';
 const routes = process.argv.slice(2).length
   ? process.argv.slice(2)
   : ['/', '/about', '/work', '/skills', '/credentials', '/guestbook', '/contact'];
-const base = 'http://localhost:9310';
+const base = process.env.BASE || 'http://localhost:9310';
 
 /**
  * Chuỗi biểu diễn cây DOM, bỏ comment và thuộc tính style (animation runtime).

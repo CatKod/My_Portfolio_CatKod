@@ -13,7 +13,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { join as joinPath } from 'node:path';
 import { writeFileSafe } from './writeSafe.mjs';
 import { splitFile, joinFile } from './flight.mjs';
-import { replaceNodeChildren, spanOfArray } from './flightNode.mjs';
+import { replaceNodeChildren, spanOfArray, findNodeChildrenSpan } from './flightNode.mjs';
 import { elementsByClass, esc } from './dom.mjs';
 import { logoLoop, skillCard, toolGroup, flowGrid, indexButton, buildFocus } from './build.mjs';
 import { skillCardFlight, toolGroupFlight, proofGridChildren } from './skillsFlight.mjs';
@@ -27,7 +27,7 @@ import {
 import {
   profile, hero, capabilities, about, aboutHeading, workHistory, education,
   projects, skillGroups, skillTools, skillsHero, credentials, credentialStats,
-  credentialHeading, credentialRoles, contact,
+  credentialHeading, credentialRoles, contact, portrait,
 } from './profile.mjs';
 
 /** Đường dẫn nguồn (bản gốc) và đích (site phục vụ). */
@@ -150,6 +150,31 @@ function dropFlightLines(parts, predicate) {
 /** Thay `children` của mọi node có `className` khớp trong flight. */
 function replaceFlightChildren(parts, className, build) {
   return replaceNodeChildren(parts, className, build);
+}
+
+/**
+ * Thêm một phần tử vào CUỐI mảng `children` của node có `className` khớp.
+ *
+ * Dùng khi cần bổ sung node mới vào một cây component đã có sẵn (ví dụ thẻ ảnh
+ * chân dung thành hàng 3 của `.profile-brief`) mà không muốn viết lại toàn bộ
+ * `children` — vì `children` của `.profile-brief` chứa blob calendar rất lớn,
+ * viết lại sẽ dễ sai lệch với DOM.
+ *
+ * @param {string} className  class của node cha
+ * @param {string} childJson  JSON của node con (dạng `["$","article",null,{...}]`)
+ */
+function appendFlightChild(parts, className, childJson) {
+  return parts.map((p) => {
+    if (p.kind === 'raw') return p;
+    let t = p.text;
+    const span = findNodeChildrenSpan(t, className);
+    if (!span) return p;
+    const arr = t.slice(span.start, span.end);
+    // mảng rỗng -> thay luôn, ngược lại -> thêm dấu phẩy trước phần tử mới
+    const isEmpty = arr === '[]';
+    const inner = isEmpty ? childJson : arr.slice(0, -1) + ',' + childJson + ']';
+    return { ...p, text: t.slice(0, span.start) + inner + t.slice(span.end) };
+  });
 }
 
 /**
@@ -445,6 +470,27 @@ function doAbout(parts, calendar) {
     ],
   ]);
 
+  // Thẻ ảnh chân dung (DOM): hàng thứ 3 của .profile-brief, đặt sau
+  // .github-activity. Hấp thụ khoảng trống dọc 152px giữa cột trái và cột
+  // phải của .profile-board ở 1440x900.
+  parts = replaceByClass(parts, 'profile-brief', (el) => {
+    if (el.includes('profile-portrait-card')) return null;
+    const card =
+      '<article class="profile-portrait-card">' +
+      `<img src="${esc(portrait.src)}" alt="${esc(portrait.alt)}" class="profile-portrait-img" width="${portrait.width}" height="${portrait.height}" loading="lazy" decoding="async" />` +
+      '<div class="profile-portrait-info">' +
+      `<span class="profile-portrait-label">${esc(portrait.label)}</span>` +
+      `<h3 class="profile-portrait-name">${esc(portrait.name)}</h3>` +
+      `<p class="profile-portrait-role">${esc(portrait.role)}</p>` +
+      `<p class="profile-portrait-meta">${esc(portrait.meta)}</p>` +
+      '</div>' +
+      '</article>';
+    // chèn trước thẻ đóng </section> cuối cùng của .profile-brief
+    const close = el.lastIndexOf('</section>');
+    if (close < 0) return null;
+    return el.slice(0, close) + card + el.slice(close);
+  });
+
   // Lịch sử công việc + học vấn (DOM): 2 cột history-list
   parts = replaceByClass(parts, 'history-list', (el, listIndex) => {
     const items = listIndex === 0 ? workHistory : education;
@@ -492,6 +538,57 @@ function doAbout(parts, calendar) {
       ]),
     );
   });
+
+  // Thẻ ảnh chân dung (flight): thêm vào cuối children của `.profile-brief`,
+  // khớp đúng với DOM (thẻ nằm sau `.github-activity`).
+  //
+  // Cấu trúc node phải khớp DOM để React không báo hydration mismatch:
+  //   article.profile-portrait-card
+  //     img.profile-portrait-img
+  //     div.profile-portrait-info
+  //       span / h3 / p / p
+  parts = appendFlightChild(
+    parts,
+    'profile-brief',
+    JSON.stringify([
+      '$',
+      'article',
+      null,
+      {
+        className: 'profile-portrait-card',
+        children: [
+          [
+            '$',
+            'img',
+            null,
+            {
+              src: portrait.src,
+              alt: portrait.alt,
+              className: 'profile-portrait-img',
+              width: portrait.width,
+              height: portrait.height,
+              loading: 'lazy',
+              decoding: 'async',
+            },
+          ],
+          [
+            '$',
+            'div',
+            null,
+            {
+              className: 'profile-portrait-info',
+              children: [
+                ['$', 'span', null, { className: 'profile-portrait-label', children: portrait.label }],
+                ['$', 'h3', null, { className: 'profile-portrait-name', children: portrait.name }],
+                ['$', 'p', null, { className: 'profile-portrait-role', children: portrait.role }],
+                ['$', 'p', null, { className: 'profile-portrait-meta', children: portrait.meta }],
+              ],
+            },
+          ],
+        ],
+      },
+    ]),
+  );
 
   return parts;
 }
