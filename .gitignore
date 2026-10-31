@@ -24,3 +24,9 @@ shots/
 tools/*.txt
 tools/*.html
 tools/*.json
+
+# Kết quả so sánh DOM (script parity/diff)
+tmp_*_tree.txt
+
+# Dependency của script kiểm thử (playwright)
+node_modules/

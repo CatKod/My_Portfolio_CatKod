@@ -1,0 +1,15 @@
+{
+  "name": "my-portfolio-catkod-tools",
+  "private": true,
+  "type": "module",
+  "description": "Công cụ dựng và kiểm thử site tĩnh portfolio của Hoàng Kim Vĩnh (CatKod)",
+  "scripts": {
+    "build": "node tools/buildSite.mjs",
+    "serve": "java -jar build/libs/portfolio-kt.jar --port=9310 --root=site",
+    "check": "node tools/parityCheck.mjs",
+    "check:icons": "node tools/iconmapdiff.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.64.1"
+  }
+}

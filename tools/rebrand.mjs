@@ -11,6 +11,7 @@
  */
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { join as joinPath } from 'node:path';
+import { writeFileSafe } from './writeSafe.mjs';
 import { splitFile, joinFile } from './flight.mjs';
 import { replaceNodeChildren, spanOfArray } from './flightNode.mjs';
 import { elementsByClass, esc } from './dom.mjs';
@@ -667,16 +668,20 @@ function doCredentials(parts) {
     return `<div class="credential-stat-grid" aria-label="Credential summary">${spans}</div>`;
   });
 
-  // Bốn chứng chỉ (DOM) — giữ đúng cấu trúc của component CredentialPreviewCard
+  // Bốn chứng chỉ (DOM) — khớp đúng cấu trúc của component CredentialPreviewCard.
+  //
+  // Bản gốc mở modal PDF.js. Hoàng Kim Vĩnh không có file PDF chứng chỉ, chỉ có
+  // link verify công khai, nên card render thành thẻ <a> mở link ra ngoài.
+  // Client bundle (tools/patchCredLink.mjs) được patch theo đúng nhánh này.
   parts = replaceByClass(parts, 'credential-certificate-list', () => {
     const cards = credentials
       .map(
         (c) =>
-          `<button aria-label="Preview PDF: ${esc(c.title)}" class="credential-preview-card credential-certificate-card" type="button">` +
-          `<div class="credential-card-topline"><span>${esc(c.code)}</span><small>Preview PDF${ICON_FILE_SEARCH}</small></div>` +
+          `<a aria-label="Open credential: ${esc(c.title)}" class="credential-preview-card credential-certificate-card" href="${esc(c.href)}" rel="noreferrer" target="_blank">` +
+          `<div class="credential-card-topline"><span>${esc(c.code)}</span><small>Open credential${ICON_FILE_SEARCH}</small></div>` +
           `<div class="credential-thumb" aria-hidden="true"><img alt="" loading="lazy" decoding="async" data-nimg="fill" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent" src="${c.image}"/></div>` +
           `<div class="credential-card-copy"><span>${esc(c.label)}</span><strong>${esc(c.title)}</strong><p>${esc(c.issuer)}</p></div>` +
-          '</button>',
+          '</a>',
       )
       .join('');
     return `<div class="credential-certificate-list">${cards}</div>`;
@@ -841,7 +846,7 @@ function rebrandChunks() {
       if (from) out = out.split(from).join(to);
     }
     if (out !== src) {
-      writeFileSync(p, out, 'utf8');
+      writeFileSafe(p, out);
       console.log('chunk', file, src.length, '->', out.length);
     }
   }
@@ -874,6 +879,6 @@ for (const [route, [src, dst]] of Object.entries(ROUTES)) {
   parts = replaceSocials(parts);
   parts = replaceLogo(parts);
   const out = joinParts(parts);
-  writeFileSync(dst, out, 'utf8');
+  writeFileSafe(dst, out);
   console.log(route.padEnd(13), before, '->', out.length);
 }

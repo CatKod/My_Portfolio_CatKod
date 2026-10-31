@@ -379,8 +379,8 @@ export const credentials = [
 
 /** Trang Credentials — thống kê. */
 export const credentialStats = [
-  { label: 'PDF archive', value: '4' },
-  { label: 'Certificates', value: '4' },
+  { label: 'Verified records', value: '4' },
+  { label: 'Certificates', value: '3' },
   { label: 'Verified online', value: '4' },
   { label: 'Learning tracks', value: '2' },
 ];

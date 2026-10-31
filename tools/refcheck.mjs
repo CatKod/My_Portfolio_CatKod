@@ -1,32 +1,26 @@
-import { readFileSync } from 'node:fs';
+import fs from 'fs';
+import path from 'path';
 
-const file = process.argv[2];
-const s = readFileSync(file, 'utf8');
-const re = /self\.__next_f\.push\(\[1,("(?:[^"\\]|\\.)*")\]\)/g;
-let flight = '';
-for (const m of s.matchAll(re)) {
-  try {
-    flight += JSON.parse(m[1]);
-  } catch {
-    /* ignore */
+const renamed = fs.readdirSync('site/_next/static/chunks').filter((f) => f.endsWith('.catkod.js'));
+
+const files = [];
+(function walk(d) {
+  for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+    const p = path.join(d, e.name);
+    if (e.isDirectory()) walk(p);
+    else files.push(p);
   }
-}
+})('site');
 
-const rows = new Map();
-for (const line of flight.split('\n')) {
-  const m = line.match(/^([0-9a-f]+):(.*)$/);
-  if (!m) continue;
-  rows.set(m[1], m[2]);
+for (const nf of renamed) {
+  const old = nf.replace('.catkod.js', '.js');
+  const hits = [];
+  for (const f of files) {
+    if (f.endsWith('/' + old)) continue;
+    let s;
+    try { s = fs.readFileSync(f, 'utf8'); } catch { continue; }
+    const n = s.split('/_next/static/chunks/' + old).length - 1;
+    if (n > 0) hits.push(f + ' x' + n);
+  }
+  console.log(old, '->', nf, hits.length ? hits.join(', ') : 'OK');
 }
-
-const refs = new Map();
-for (const m of flight.matchAll(/\$L([0-9a-f]+)/g)) {
-  if (!refs.has(m[1])) refs.set(m[1], 0);
-  refs.set(m[1], refs.get(m[1]) + 1);
-}
-
-console.log('rows:', rows.size);
-const missing = [...refs.keys()].filter((id) => !rows.has(id));
-console.log('refs:', refs.size);
-console.log('MISSING refs:', missing.map((id) => id + ' x' + refs.get(id)).join(', ') || '(none)');
-console.log('unreferenced rows:', [...rows.keys()].filter((id) => !refs.has(id)).join(', ') || '(none)');

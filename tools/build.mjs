@@ -126,8 +126,17 @@ export function indexButton(project, index) {
 /* ------------------------------------------------------------------ */
 
 const SVG = {
+  /**
+   * Icon Images có hai kích thước khác nhau trong client bundle:
+   *   - `project-shot-label`   → size 14
+   *   - `project-shot-empty`   → size 18
+   * Dùng chung một kích thước sẽ làm DOM server lệch với DOM client →
+   * React báo hydration mismatch (#418).
+   */
   images:
     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-images"><path d="M18 22H4a2 2 0 0 1-2-2V6"></path><path d="m22 13-1.296-1.296a2.41 2.41 0 0 0-3.408 0L11 18"></path><circle cx="12" cy="8" r="2"></circle><rect width="16" height="16" x="6" y="2" rx="2"></rect></svg>',
+  imagesLg:
+    '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-images"><path d="M18 22H4a2 2 0 0 1-2-2V6"></path><path d="m22 13-1.296-1.296a2.41 2.41 0 0 0-3.408 0L11 18"></path><circle cx="12" cy="8" r="2"></circle><rect width="16" height="16" x="6" y="2" rx="2"></rect></svg>',
   arrowUpRight:
     '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>',
   arrowUpRightLg:
@@ -169,7 +178,7 @@ export function buildFocus(pr, index, total) {
       `<span class="project-shot-open">Open${SVG.arrowUpRight}</span>` +
       (pr.images.length > 1 ? '<span aria-hidden="true" class="project-shot-stack"></span>' : '') +
       '</button>'
-    : '<div class="project-shot-empty">' + SVG.images + '<span>Screenshot slot</span>' +
+    : '<div class="project-shot-empty">' + SVG.imagesLg + '<span>Screenshot slot</span>' +
       `<strong>${esc(pr.title)}</strong></div>`;
 
   const info = flowGrid(pr);
