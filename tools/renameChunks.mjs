@@ -221,6 +221,32 @@ for (const [old, neu] of finalName) {
 // File cũ KHÔNG bị xoá ở đây. `pruneChunks.mjs` sẽ dọn sau khi đủ thời gian.
 
 // ---------------------------------------------------------------------------
+// 7b. GIỮ THÊM alias cho tên đang được cache phổ biến
+//
+// Bản trước dùng hậu tố tĩnh `.catkod` (vd `0kv4a-p~1zj9b.catkod.css`). Người
+// dùng đang có HTML cache trỏ tới đúng tên đó. Nếu file đó biến mất, họ nhận
+// 404 cho CSS và thấy trang không có style.
+//
+// Vì vậy: tạo thêm bản copy với tên `.catkod.<ext>` (không hash) chứa CÙNG
+// nội dung đã vá. Tên này tồn tại vĩnh viễn => URL cũ luôn tải được, và nội
+// dung đã vá nên người dùng thấy bản đúng ngay cả khi HTML của họ cũ.
+// ---------------------------------------------------------------------------
+const legacyAliases = [];
+for (const [old, neu] of renamed) {
+  const m = /^(.*)\.catkod\.([0-9a-f]{8})(\.(?:js|css))$/.exec(neu);
+  if (!m) continue;
+  const alias = m[1] + '.catkod' + m[3];
+  const aliasPath = join(chunkDir, alias);
+  if (existsSync(aliasPath)) continue;
+  writeFileSync(aliasPath, finalContent.get(old), 'utf8');
+  legacyAliases.push([neu, alias]);
+}
+if (legacyAliases.length) {
+  console.log('giữ alias tên cũ (cho cache đang tồn tại):');
+  for (const [neu, alias] of legacyAliases) console.log('  ' + neu + '  =>  ' + alias);
+}
+
+// ---------------------------------------------------------------------------
 // 8. Cập nhật tham chiếu toàn site
 // ---------------------------------------------------------------------------
 function walk(dir, out = []) {
@@ -267,7 +293,7 @@ try {
 } catch {
   generations = [];
 }
-const currentGen = [...finalName.values()].sort();
+const currentGen = [...finalName.values(), ...legacyAliases.map(([, a]) => a)].sort();
 generations = [currentGen, ...generations.filter((g) => g && g.length)].slice(0, 3);
 writeFileSync(manifestPath, JSON.stringify({ generations }, null, 1));
 

@@ -50,21 +50,41 @@ if (dangling.size) {
 }
 
 // --- 2 & 3. tên + hash --------------------------------------------------
+// Tên hợp lệ có 2 dạng:
+//   <stem>.catkod.<hash8>.<ext>   tên có hash — dùng cho URL mới (bust cache)
+//   <stem>.catkod.<ext>           alias tĩnh cho URL cũ đang được cache
 const HASH_RE = /^(.*)\.catkod\.([0-9a-f]{8})\.(js|css)$/;
+const ALIAS_RE = /^(.*)\.catkod\.(js|css)$/;
 for (const c of chunks) {
   const m = HASH_RE.exec(c);
-  if (!m) {
-    if (/\.catkod\.(js|css)$/.test(c)) {
-      console.log('TÊN CŨ (dễ dính cache): ' + c);
+  if (m) {
+    const real = createHash('sha256').update(fs.readFileSync(path.join(chunkDir, c))).digest('hex').slice(0, 8);
+    if (real !== m[2]) {
+      console.log('HASH KHÔNG KHỚP nội dung: ' + c + '  (tên=' + m[2] + ' thực=' + real + ')');
       errors++;
     }
     continue;
   }
-  const real = createHash('sha256').update(fs.readFileSync(path.join(chunkDir, c))).digest('hex').slice(0, 8);
-  if (real !== m[2]) {
-    console.log('HASH KHÔNG KHỚP nội dung: ' + c + '  (tên=' + m[2] + ' thực=' + real + ')');
-    errors++;
+  const a = ALIAS_RE.exec(c);
+  if (a) {
+    // Alias phải chứa CÙNG nội dung với bản có hash tương ứng.
+    const hashed = fs
+      .readdirSync(chunkDir)
+      .find((x) => x.startsWith(a[1] + '.catkod.') && x.endsWith(a[2]));
+    if (!hashed) {
+      console.log('ALIAS KHÔNG CÓ BẢN CÓ HASH tương ứng: ' + c);
+      errors++;
+      continue;
+    }
+    const same =
+      fs.readFileSync(path.join(chunkDir, c)).equals(fs.readFileSync(path.join(chunkDir, hashed)));
+    if (!same) {
+      console.log('ALIAS KHÁC NỘI DUNG với bản có hash: ' + c + ' vs ' + hashed);
+      errors++;
+    }
+    continue;
   }
+  // Tên gốc của Next.js: giữ nguyên, không cần hash.
 }
 
 // --- 4. thống kê thế hệ ------------------------------------------------
