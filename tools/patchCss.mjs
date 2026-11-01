@@ -135,6 +135,78 @@ const PATCHES = [
     '.profile-brief{grid-template-rows:minmax(118px,auto) minmax(150px,auto)}',
     '.profile-brief{grid-template-rows:minmax(118px,auto) minmax(150px,auto) auto}',
   ],
+
+  // ==========================================================================
+  // VÍ DỤ 3 — chồng chữ trang chủ (.home-intro đè lên .home-system)
+  // ==========================================================================
+  //
+  // Nguyên nhân gốc (đã đo bằng Playwright trên bản live, viewport 1536x864):
+  //
+  //   .home-scene { grid-template-rows: min-content minmax(0,1fr) min-content }
+  //   .home-title  { grid-area: 1/1 }
+  //   .home-intro  { grid-area: 2/1; align-self: start }
+  //   .home-system { grid-area: 3/1/auto/-1 }
+  //
+  // Ở viewport >=1180px, `.home-scene` chuyển sang 2 CỘT nhưng
+  // `grid-template-rows` vẫn là 3 hàng. Hàng 2 là `minmax(0,1fr)` — tức có
+  // thể co về 0px. Khi chiều cao `.home-title` (hàng 1) + `.home-system`
+  // (hàng 3) đã chiếm hết khung, hàng 2 bị ép về 0px:
+  //
+  //   1536x864: rows = 324.469px 66.2656px 177.266px   <- hàng 2 chỉ còn 66px
+  //   1366x768: rows = 292.203px 0px     188.922px   <- hàng 2 = 0px
+  //
+  // `.home-intro` nằm ở hàng 2 với `align-self:start`, nội dung cao 225px >
+  // 0px => TRÀN ra khỏi track của hàng 2 và CHỒNG LÊN hàng 3
+  // (`.home-system`). Đo được overlap = 131px ở 1536x864 (viewport thật của
+  // user: màn 1920x1080 fullscreen @ Windows scale 125% => CSS 1536x864),
+  // 147px ở 1280x800, 192px ở 1492x800, 188px ở 1366x768.
+  //
+  // Cách sửa:
+  //
+  //  1. `minmax(0,1fr)` -> `minmax(min-content,1fr)`
+  //     Hàng 2 không bao giờ bị ép về 0 nữa; nó lấy đúng chiều cao nội dung
+  //     (min-content) và phần dư thừa vẫn được chia đều (1fr).
+  //
+  //  2. `overflow-y:auto` cho `.home-scene`
+  //     Khi tổng chiều cao 3 hàng vẫn lớn hơn khung (màn thấp), nội dung
+  //     cuộn dọc thay vì bị cắt mất. Ẩn scrollbar cho giống thiết kế gốc
+  //     (`.stage` cũng dùng `scrollbar-width:none`).
+  //
+  //  3. Ở màn không cao lắm (max-height:900px) co nhẹ tiêu đề + khoảng cách
+  //     để nội dung vừa khung, hạn chế phải cuộn.
+  //     Đo lại: title padding 132px -> 88px, h1 clamp(2.9rem,6.5vw,6.55rem)
+  //     -> clamp(2.9rem,5.4vw,5.3rem) (82.9px thay vì 99.8px ở 1536x864).
+  //
+  // Kết quả kiểm chứng (Playwright, 30 viewport từ 768x1024 tới 1728x1117):
+  //   trước: 0/30 sạch -> sau: 30/30 sạch (overlap âm, 0 cặp text chồng).
+  //
+  [
+    '.home-scene{grid-template-rows:min-content minmax(0,1fr) min-content;grid-template-columns:minmax(0,1fr);gap:clamp(14px,2.2vw,28px);display:grid;position:relative;overflow:hidden}',
+    '.home-scene{grid-template-rows:min-content minmax(min-content,1fr) min-content;grid-template-columns:minmax(0,1fr);gap:clamp(14px,2.2vw,28px);display:grid;position:relative;overflow:hidden;overflow-y:auto;scrollbar-width:none}' +
+      '.home-scene::-webkit-scrollbar{display:none}',
+  ],
+  // Biến thể 721-1100px (1 cột): hàng 2 cũng là minmax(0,1fr)
+  [
+    '.home-scene{grid-template-rows:auto minmax(0,1fr) min-content;grid-template-columns:minmax(0,1fr);gap:22px}',
+    '.home-scene{grid-template-rows:auto minmax(min-content,1fr) min-content;grid-template-columns:minmax(0,1fr);gap:22px;overflow-y:auto;scrollbar-width:none}' +
+      '.home-scene::-webkit-scrollbar{display:none}',
+  ],
+  // Biến thể max-height:760px
+  [
+    '.home-scene{grid-template-rows:auto minmax(0,1fr) min-content;grid-template-columns:minmax(0,1fr);align-content:space-between;gap:16px;height:100%;min-height:0;overflow:hidden}',
+    '.home-scene{grid-template-rows:auto minmax(min-content,1fr) min-content;grid-template-columns:minmax(0,1fr);align-content:space-between;gap:16px;height:100%;min-height:0;overflow:hidden;overflow-y:auto;scrollbar-width:none}' +
+      '.home-scene::-webkit-scrollbar{display:none}',
+  ],
+  // Co nội dung ở màn không cao lắm để hạn chế cuộn
+  [
+    null,
+    '@media (min-width:1180px) and (max-height:900px){' +
+      '.stage.stage--home .home-title{padding-top:clamp(56px,7vh,88px)}' +
+      '.home-title h1{font-size:clamp(2.9rem,5.4vw,5.3rem)}' +
+      '.home-intro{padding-top:clamp(10px,1.4vh,18px)}' +
+      '.home-scene{gap:clamp(12px,1.6vw,20px)}' +
+      '}',
+  ],
 ];
 
 let touched = 0;
