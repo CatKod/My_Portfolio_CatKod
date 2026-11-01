@@ -7,14 +7,20 @@
  *   (vd: 0kv4a-p~1zj9b.catkod.1bb0b6dd.css). Nếu file đó trên server chứa
  *   CSS cũ (chưa vá) thì người dùng vẫn thấy lỗi. Nếu xoá hẳn thì 404.
  *   => Ghi đè bằng CSS mới (đã vá) là giải pháp đúng cho cả hai trường hợp.
+ *
+ * Nguồn nội dung mới: deploy/_next/static/chunks
+ * Nguồn tên file cũ: git HEAD của repo Pages (lấy danh sách file trong lịch sử).
  */
 import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 
-const SRC = 'site/_next/static/chunks';
-const DST = 'D:/GitHub/CatKod.github.io.pages/_next/static/chunks';
+const DEPLOY = 'deploy/_next/static/chunks';
+const PAGES = 'D:/GitHub/CatKod.github.io.pages';
+const DST = PAGES + '/_next/static/chunks';
 
-const srcFiles = readdirSync(SRC).filter((f) => f.endsWith('.css') || f.endsWith('.js'));
+const srcFiles = readdirSync(DEPLOY).filter((f) => f.endsWith('.css') || f.endsWith('.js'));
 const dstFiles = readdirSync(DST).filter((f) => f.endsWith('.css') || f.endsWith('.js'));
 
 // file "gốc" của mỗi họ: tên không có .catkod.<hash>
@@ -23,40 +29,61 @@ const family = (name) => {
   return m ? m[1] + m[3] : name;
 };
 
-// nội dung mới nhất của mỗi họ, lấy từ site/ (đã vá)
+// nội dung mới nhất của mỗi họ, lấy từ deploy/ (đã vá)
 const latest = new Map();
 for (const f of srcFiles) {
   if (/\.catkod\.[0-9a-f]{8}\.(css|js)$/.test(f)) {
     const key = family(f);
-    const p = join(SRC, f);
+    const p = join(DEPLOY, f);
     const st = statSync(p);
     const cur = latest.get(key);
     if (!cur || st.mtimeMs > cur.mtimeMs) latest.set(key, { file: f, mtimeMs: st.mtimeMs, path: p });
   }
 }
 
+// các tên file thế hệ cũ đã từng được deploy: lấy từ lịch sử git của repo Pages
+const oldNames = new Set();
+try {
+  const log = execFileSync('git', ['log', '--all', '--pretty=format:%H'], {
+    cwd: PAGES,
+    encoding: 'utf8',
+  });
+  const commits = log.split('\n').filter(Boolean).slice(0, 12);
+  for (const c of commits) {
+    const files = execFileSync('git', ['ls-tree', '-r', '--name-only', c, '_next/static/chunks'], {
+      cwd: PAGES,
+      encoding: 'utf8',
+    })
+      .split('\n')
+      .filter((f) => f && /\.(css|js)$/.test(f));
+    for (const f of files) {
+      const name = f.split('/').pop();
+      if (/\.catkod\.[0-9a-f]{8}\.(css|js)$/.test(name)) oldNames.add(name);
+    }
+  }
+} catch (e) {
+  console.log('  (khong doc duoc git log: ' + e.message.slice(0, 60) + ')');
+}
+
 console.log('=== ghi de file the he cu bang noi dung da va ===');
 let n = 0;
-for (const f of dstFiles) {
-  // chi xu ly file the he cu (co hash) khac file moi nhat
-  if (!/\.catkod\.[0-9a-f]{8}\.(css|js)$/.test(f)) continue;
-  const key = family(f);
+for (const name of oldNames) {
+  if (dstFiles.includes(name)) continue;
+  const key = family(name);
   const src = latest.get(key);
   if (!src) {
     console.log('  (khong tim thay ban moi cho ' + key + ')');
     continue;
   }
-  if (src.file === f) continue;
   const buf = readFileSync(src.path);
-  writeFileSync(join(DST, f), buf);
+  writeFileSync(join(DST, name), buf);
   n++;
-  console.log('  ' + f + '  <=  ' + src.file + '  (' + buf.length + ' bytes)');
+  console.log('  ' + name + '  <=  ' + src.file + '  (' + buf.length + ' bytes)');
 }
 console.log('  da ghi de ' + n + ' file');
 
 console.log('\n=== kiem tra: noi dung CSS cu == CSS moi? ===');
-const crypto = await import('node:crypto');
-const sha = (p) => crypto.createHash('sha256').update(readFileSync(p)).digest('hex').slice(0, 8);
-for (const f of dstFiles.filter((x) => x.endsWith('.css'))) {
+const sha = (p) => createHash('sha256').update(readFileSync(p)).digest('hex').slice(0, 8);
+for (const f of readdirSync(DST).filter((x) => x.endsWith('.css'))) {
   console.log('  ' + f.padEnd(42) + ' sha=' + sha(join(DST, f)));
 }

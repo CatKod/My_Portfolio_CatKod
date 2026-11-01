@@ -1,85 +1,30 @@
 /**
- * Đồng bộ bản build trong site/ sang repo deploy GitHub Pages.
+ * Deploy lên repo GitHub Pages theo đúng pipeline của repo:
  *
- * Chiến lược:
- *  - Copy toàn bộ site/ sang repo deploy (xoá file cũ không còn dùng).
- *  - GIỮ LẠI 1 thế hệ chunk cũ (tên .catkod.<hash>.css / .js) để trình
- *    duyệt đang cache HTML cũ vẫn tải được asset (đã vá) thay vì 404.
- *  - File mới luôn có tên content-hash khác => cache bust tự nhiên.
+ *   1. prepareDeploy.mjs  — site/ -> deploy/ (route không đuôi -> thư mục
+ *                            kèm index.html, bỏ file không dùng, thêm .nojekyll)
+ *   2. syncPages.mjs      — deploy/ -> repo Pages (giữ README.md)
+ *   3. syncLegacyChunks.mjs — ghi đè các file chunk thế hệ cũ (tên .catkod.<hash>)
+ *                            bằng nội dung đã vá, để trình duyệt đang cache HTML
+ *                            cũ vẫn nhận được bản sửa thay vì 404.
+ *
+ * Bắt buộc phải qua bước 1: GitHub Pages phục vụ file không đuôi với
+ * Content-Type `application/octet-stream`, khiến trình duyệt tải file thay vì
+ * render trang.
  */
-import {
-  existsSync,
-  mkdirSync,
-  cpSync,
-  rmSync,
-  readdirSync,
-  statSync,
-  writeFileSync,
-} from 'node:fs';
-import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-const SRC = 'site';
-const DST = 'D:/GitHub/CatKod.github.io.pages';
+const run = (script, ...args) =>
+  execFileSync('node', ['tools/' + script, ...args], { stdio: 'inherit' });
 
-if (!existsSync(SRC)) throw new Error('khong thay ' + SRC);
+console.log('=== 1/3 prepareDeploy (site -> deploy) ===');
+run('prepareDeploy.mjs', 'site', 'deploy');
 
-console.log('=== xoa noi dung cu (giu .git, README.md) ===');
-for (const entry of readdirSync(DST)) {
-  if (entry === '.git' || entry === 'README.md') continue;
-  rmSync(join(DST, entry), { recursive: true, force: true });
-}
+console.log('\n=== 2/3 syncPages (deploy -> repo Pages) ===');
+run('syncPages.mjs', 'deploy', 'D:/GitHub/CatKod.github.io.pages');
 
-console.log('=== copy site/ sang repo deploy ===');
-for (const entry of readdirSync(SRC)) {
-  const s = join(SRC, entry);
-  const d = join(DST, entry);
-  if (statSync(s).isDirectory()) {
-    cpSync(s, d, { recursive: true, force: true });
-  } else {
-    cpSync(s, d, { force: true });
-  }
-}
+console.log('\n=== 3/3 syncLegacyChunks (alias thế hệ cũ) ===');
+run('syncLegacyChunks.mjs');
 
-// .nojekyll: bat buoc cho GitHub Pages khong bo qua thu muc _next
-if (!existsSync(join(DST, '.nojekyll'))) writeFileSync(join(DST, '.nojekyll'), '');
-
-// ---- giu lai 1 the he chunk cu tu git HEAD ----
-console.log('=== khoi phuc 1 the he chunk cu tu git HEAD ===');
-const chunksDir = join(DST, '_next/static/chunks');
-const current = readdirSync(chunksDir).filter((f) => f.endsWith('.css') || f.endsWith('.js'));
-
-let restored = 0;
-try {
-  const oldFiles = execFileSync(
-    'git',
-    ['ls-tree', '-r', '--name-only', 'HEAD', '_next/static/chunks'],
-    { cwd: DST, encoding: 'utf8' },
-  )
-    .split('\n')
-    .filter((f) => f && /\.(css|js)$/.test(f));
-
-  for (const f of oldFiles) {
-    const name = f.split('/').pop();
-    if (!/\.catkod\.[0-9a-f]{8}\.(css|js)$/.test(name)) continue;
-    if (current.includes(name)) continue;
-    const buf = execFileSync('git', ['show', 'HEAD:' + f], {
-      cwd: DST,
-      maxBuffer: 64 * 1024 * 1024,
-    });
-    writeFileSync(join(chunksDir, name), buf);
-    restored++;
-    console.log('  giu lai: ' + name);
-  }
-} catch (e) {
-  console.log('  (khong doc duoc git HEAD: ' + e.message.slice(0, 60) + ')');
-}
-console.log('  da giu lai ' + restored + ' file chunk cu');
-
-console.log('\n=== ket qua ===');
-console.log(
-  'css:\n     ' +
-    readdirSync(chunksDir)
-      .filter((f) => f.endsWith('.css'))
-      .join('\n     '),
-);
+console.log('\nHoàn tất. Kiểm tra trước khi push:');
+console.log('  cd D:/GitHub/CatKod.github.io.pages && git status && git diff --cached');

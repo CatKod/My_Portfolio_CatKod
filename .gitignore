@@ -41,3 +41,4 @@ tmp_repos.json
 # Script dò một lần, chỉ dùng trong lúc điều tra (không tái sử dụng được)
 tools/cvfind.mjs
 tools/rscfind.mjs
+.tmp-before/
