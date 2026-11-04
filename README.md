@@ -3,6 +3,20 @@
 Bản dựng lại **giống hệt** trang [`irfansabrian.vercel.app`](https://irfansabrian.vercel.app),
 viết bằng Kotlin thuần (chỉ dùng JDK, không framework).
 
+> **Repo này chứa gì?** Đây là **pipeline dựng lại** website tĩnh (đổi thương hiệu
+> từ bản gốc sang profile của Hoàng Kim Vĩnh) + server Kotlin để kiểm thử local.
+> Website đã publish nằm ở repo [`CatKod/CatKod.github.io`](https://github.com/CatKod/CatKod.github.io).
+>
+> Chi tiết kiến trúc pipeline: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## Bắt đầu nhanh
+
+```bash
+npm install                # chỉ cần cho script kiểm thử Playwright
+node tools/bootstrap.mjs   # tải bản site gốc (site.orig.bak/, gitignored)
+npm run build              # dựng lại site/ + kiểm tra tham chiếu + sinh CV PDF
+```
+
 ## Kiến trúc
 
 ```
@@ -13,9 +27,32 @@ src/main/kotlin/catkod/portfolio/
 ├── StaticFiles.kt    # Phục vụ nội dung tĩnh trong site/
 ├── LivePages.kt      # Trang có dữ liệu sống (biểu đồ GitHub)
 └── UpstreamProxy.kt  # Chuyển tiếp yêu cầu động về site gốc
+
+tools/
+├── build/      # Các bước biến đổi site (rebrand, vá CSS, đổi tên chunk)
+├── lib/        # Module dùng chung (DOM, flight payload, render, ghi file an toàn)
+├── data/       # Nguồn nội dung duy nhất: profile.mjs, icons.mjs
+├── cv/         # Sinh CV PDF từ profile.mjs
+├── deploy/     # Chuẩn bị bản deploy + đồng bộ sang repo GitHub Pages
+├── verify/     # Script kiểm tra (route, icon map, tham chiếu, parity DOM)
+├── config/     # Đường dẫn gốc của repo + manifest bản gốc
+└── scratch/    # Script điều tra 1-lần (gitignored)
+
+docs/
+├── ARCHITECTURE.md   # Kiến trúc pipeline, vai trò từng thư mục
+├── brief-portrait.md # Brief thiết kế thẻ ảnh chân dung
+└── templates/        # Markup gốc của từng component (tham khảo khi vá)
 ```
 
-### Luồng xử lý yêu cầu
+### Nguồn nội dung duy nhất
+
+**`tools/data/profile.mjs`** — sửa file này là site đổi. Cùng dữ liệu đó được
+đưa vào DOM SSR, RSC flight payload và CV PDF, nên không thể lệch nhau.
+
+`tools/data/icons.mjs` — ánh xạ tên công nghệ → icon SVG trên CDN. Bản client
+được đồng bộ tự động bởi `build/synciconmap.mjs` (tránh hydration mismatch).
+
+### Luồng xử lý yêu cầu (server Kotlin)
 
 1. **Trang dữ liệu sống** (`/about` — biểu đồ hoạt động GitHub): lấy trực tiếp từ site gốc,
    cache HTML ngắn (mặc định 60s). Yêu cầu RSC luôn đi thẳng upstream để không bị stale.
@@ -25,7 +62,7 @@ src/main/kotlin/catkod/portfolio/
    header + query + body xuống site gốc, nhờ vậy điều hướng client-side của Next.js
    hoạt động y hệt.
 
-## Chạy
+## Chạy server
 
 ```bash
 # Build
@@ -46,19 +83,44 @@ java -jar build/libs/portfolio-kt.jar --port=8080 --root=site
 | `--live=` | `/about` | Trang dữ liệu sống (phân tách bằng dấu phẩy) |
 | `--live-cache=` | `60000` | TTL cache (ms) cho trang dữ liệu sống |
 
-## Công cụ kiểm chứng (`tools/`)
+## Công cụ (`tools/`)
 
-Các script dùng REA + CDP để đối chiếu tự động:
+### Dựng & deploy
+
+```bash
+npm run build             # 9 bước: reset chunk -> rebrand -> vá -> đổi tên -> kiểm tra -> CV
+npm run deploy            # site/ -> deploy/ -> repo GitHub Pages
+```
+
+Repo Pages đích có thể override bằng biến môi trường:
+
+```bash
+CATKOD_PAGES_REPO=D:/path/to/CatKod.github.io.pages npm run deploy
+```
+
+### Kiểm chứng
+
+```bash
+npm run check             # parity SSR DOM vs DOM sau hydration (Playwright + server local)
+npm run check:icons       # icon map client khớp data/icons.mjs
+npm run check:refs        # mọi tham chiếu asset trong site/ còn hợp lệ
+npm run check:routes      # HTTP status + content-type của các route trên live
+npm run check:cdn         # icon CDN còn tồn tại
+npm run check:live        # asset trên live còn tồn tại
+```
+
+Các script dùng REA + CDP để đối chiếu tự động (đặt trong `tools/scratch/`,
+không commit):
 
 ```bash
 # Chụp & so sánh pixel từng route (dùng rea capture-web-screenshot + compare-web-screenshots)
-node tools/compare.mjs http://127.0.0.1:9310 https://irfansabrian.vercel.app /,/about,/work,/skills,/credentials,/guestbook,/contact
+node tools/scratch/compare.mjs http://127.0.0.1:9310 https://irfansabrian.vercel.app /,/about,/work,/skills,/credentials,/guestbook,/contact
 
 # So khớp byte-for-byte toàn bộ asset
-node tools/hashcmp.mjs site/_next/static/chunks https://irfansabrian.vercel.app/_next/static/chunks
+node tools/scratch/hashcmp.mjs site/_next/static/chunks https://irfansabrian.vercel.app/_next/static/chunks
 
 # Kiểm tra điều hướng client-side (RSC) có giống hệt không
-node tools/routecheck.mjs http://127.0.0.1:9310 https://irfansabrian.vercel.app
+node tools/scratch/routecheck.mjs http://127.0.0.1:9310 https://irfansabrian.vercel.app
 ```
 
 ## Đối chiếu với bản gốc

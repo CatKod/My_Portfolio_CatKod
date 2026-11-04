@@ -1,0 +1,214 @@
+{
+  "upstream": "https://irfansabrian.vercel.app",
+  "note": "Danh sách file của site.orig.bak — dùng bởi tools/bootstrap.mjs để tải lại bản gốc.",
+  "files": [
+    {
+      "path": "_next/static/chunks/0_~wm1q5~a~.5.js",
+      "bytes": 59732
+    },
+    {
+      "path": "_next/static/chunks/01e-_5wu9-q94.js",
+      "bytes": 25187
+    },
+    {
+      "path": "_next/static/chunks/01o44cn3-s8dj.js",
+      "bytes": 19620
+    },
+    {
+      "path": "_next/static/chunks/01xlw8hd842-c.js",
+      "bytes": 3377
+    },
+    {
+      "path": "_next/static/chunks/02i7dfk78~t~2.js",
+      "bytes": 53149
+    },
+    {
+      "path": "_next/static/chunks/03~yq9q893hmn.js",
+      "bytes": 112594
+    },
+    {
+      "path": "_next/static/chunks/03lu_-.84~_q..js",
+      "bytes": 59732
+    },
+    {
+      "path": "_next/static/chunks/03wksmz03n~ne.js",
+      "bytes": 59732
+    },
+    {
+      "path": "_next/static/chunks/09ebkw8~fxq_b.js",
+      "bytes": 59732
+    },
+    {
+      "path": "_next/static/chunks/09f~j.yqvpkh..js",
+      "bytes": 7351
+    },
+    {
+      "path": "_next/static/chunks/0ajckhjifzv20.js",
+      "bytes": 141598
+    },
+    {
+      "path": "_next/static/chunks/0d3shmwh5_nmn.js",
+      "bytes": 54646
+    },
+    {
+      "path": "_next/static/chunks/0fhmz5727o4n6.js",
+      "bytes": 121467
+    },
+    {
+      "path": "_next/static/chunks/0kv4a-p~1zj9b.css",
+      "bytes": 160668
+    },
+    {
+      "path": "_next/static/chunks/0m_p1bxtorv5i.js",
+      "bytes": 226355
+    },
+    {
+      "path": "_next/static/chunks/0ocwl5hn2190n.js",
+      "bytes": 25813
+    },
+    {
+      "path": "_next/static/chunks/0vof9py47_u18.js",
+      "bytes": 59732
+    },
+    {
+      "path": "_next/static/chunks/0wpriid5pfq~o.js",
+      "bytes": 5540
+    },
+    {
+      "path": "_next/static/chunks/0x.~j7vy9ohz0.js",
+      "bytes": 3377
+    },
+    {
+      "path": "_next/static/chunks/0y7k_s2ee1078.js",
+      "bytes": 17085
+    },
+    {
+      "path": "_next/static/chunks/1072v~b25fyi5.js",
+      "bytes": 19801
+    },
+    {
+      "path": "_next/static/chunks/13nbfvio._z2b.css",
+      "bytes": 44659
+    },
+    {
+      "path": "_next/static/chunks/15nsyxl.8hl16.js",
+      "bytes": 122508
+    },
+    {
+      "path": "_next/static/chunks/186c.u8l76ivb.js",
+      "bytes": 24944
+    },
+    {
+      "path": "_next/static/chunks/turbopack-0be7h0nzycdip.js",
+      "bytes": 11041
+    },
+    {
+      "path": "_next/static/media/017d9bea37084d9b-s.p.179.vsfvxa6t5.woff2",
+      "bytes": 41236
+    },
+    {
+      "path": "_next/static/media/051742360c26797e-s.p.0f97p8c3305p~.woff2",
+      "bytes": 31340
+    },
+    {
+      "path": "about",
+      "bytes": 125582
+    },
+    {
+      "path": "contact",
+      "bytes": 53554
+    },
+    {
+      "path": "credentials",
+      "bytes": 75762
+    },
+    {
+      "path": "guestbook",
+      "bytes": 57343
+    },
+    {
+      "path": "images/credentials/certificate-bnsp-junior-web-developer-2025.webp",
+      "bytes": 112908
+    },
+    {
+      "path": "images/credentials/certificate-d3-teknik-informatika-pnp-2025.png",
+      "bytes": 461201
+    },
+    {
+      "path": "images/credentials/certificate-kominfo-internship.webp",
+      "bytes": 92948
+    },
+    {
+      "path": "images/credentials/certificate-training-junior-web-programmer-2025.webp",
+      "bytes": 72896
+    },
+    {
+      "path": "images/credentials/sk-kpn-046.webp",
+      "bytes": 34734
+    },
+    {
+      "path": "images/credentials/sk-kpn-047.webp",
+      "bytes": 34864
+    },
+    {
+      "path": "images/credentials/sk-kpn-048.webp",
+      "bytes": 35060
+    },
+    {
+      "path": "images/credentials/sk-kpn-049.webp",
+      "bytes": 34512
+    },
+    {
+      "path": "images/credentials/sk-kpn-050.webp",
+      "bytes": 34102
+    },
+    {
+      "path": "images/credentials/sk-kpn-051.webp",
+      "bytes": 33430
+    },
+    {
+      "path": "images/credentials/sk-kpn-052.webp",
+      "bytes": 34860
+    },
+    {
+      "path": "images/credentials/sk-kpn-053.webp",
+      "bytes": 33772
+    },
+    {
+      "path": "images/credentials/sk-kpn-054.webp",
+      "bytes": 33096
+    },
+    {
+      "path": "images/credentials/sk-kpn-055.webp",
+      "bytes": 33444
+    },
+    {
+      "path": "images/credentials/sk-kpn-056.webp",
+      "bytes": 33330
+    },
+    {
+      "path": "images/credentials/sk-kpn-057.webp",
+      "bytes": 34642
+    },
+    {
+      "path": "images/projects/kpn-profile-company/homepage-hero.png",
+      "bytes": 1141826
+    },
+    {
+      "path": "index.html",
+      "bytes": 54111
+    },
+    {
+      "path": "irfan.svg",
+      "bytes": 750
+    },
+    {
+      "path": "skills",
+      "bytes": 294074
+    },
+    {
+      "path": "work",
+      "bytes": 104088
+    }
+  ]
+}

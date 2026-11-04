@@ -7,8 +7,13 @@ tmp_*.html
 tmpl_*.html
 gh_catkod.html
 
-# Bản gốc (site của Irfan Sabrian) chỉ dùng làm nguồn cho script rebrand
+# Bản gốc (site của Irfan Sabrian) chỉ dùng làm nguồn cho script rebrand.
+# Tải lại bằng: node tools/bootstrap.mjs
 site.orig.bak/
+
+# Script điều tra 1-lần trong lúc sửa bug — giữ trên máy để tra cứu,
+# không commit lên repo.
+tools/scratch/
 
 # Profile trình duyệt dùng cho REA
 .chrome-rea/
@@ -20,10 +25,13 @@ build/
 .kotlin/
 shots/
 
-# Output của các script dò trong tools/
+# Output của các script dò trong tools/ (chỉ ở thư mục gốc tools/)
 tools/*.txt
 tools/*.html
 tools/*.json
+
+# Danh sách icon CDN — sinh ra bởi tools/verify/fetchCdnIcons.mjs
+tools/data/cdn-icons.txt
 
 # Kết quả so sánh DOM (script parity/diff)
 tmp_*_tree.txt
@@ -31,14 +39,15 @@ tmp_*_tree.txt
 # Dependency của script kiểm thử (playwright)
 node_modules/
 
-# Bản deploy dựng cho GitHub Pages — sinh ra từ site/ bởi tools/prepareDeploy.mjs,
+# Bản deploy dựng cho GitHub Pages — sinh ra từ site/ bởi tools/deploy/prepareDeploy.mjs,
 # đã được publish sang repo CatKod/CatKod.github.io nên không cần track ở đây.
 deploy/
 
 # Output tạm của script dò GitHub repo
 tmp_repos.json
 
-# Script dò một lần, chỉ dùng trong lúc điều tra (không tái sử dụng được)
-tools/cvfind.mjs
-tools/rscfind.mjs
+# File so sánh byte-for-byte trước/sau refactor
+.refactor-before.sha256
+
 .tmp-before/
+.tmp-after/

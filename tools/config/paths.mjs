@@ -31,6 +31,12 @@ export const SITE_DIR = path.join(ROOT, 'site');
 /** Chunk JS/CSS của Next.js trong site đã build. */
 export const CHUNKS_DIR = path.join(SITE_DIR, '_next', 'static', 'chunks');
 
+/** Font/media của Next.js trong site đã build. */
+export const MEDIA_DIR = path.join(SITE_DIR, '_next', 'static', 'media');
+
+/** Thư mục chứa CV PDF. */
+export const PDF_DIR = path.join(SITE_DIR, 'pdf');
+
 /** Bản deploy chuẩn bị cho GitHub Pages. */
 export const DEPLOY_DIR = path.join(ROOT, 'deploy');
 
@@ -38,7 +44,7 @@ export const DEPLOY_DIR = path.join(ROOT, 'deploy');
 export const IMAGES_DIR = path.join(SITE_DIR, 'images');
 
 /** File CV sinh ra. */
-export const CV_PDF = path.join(SITE_DIR, 'pdf', 'CV_Hoang-Kim-Vinh_2026.pdf');
+export const CV_PDF = path.join(PDF_DIR, 'CV_Hoang-Kim-Vinh_2026.pdf');
 
 /** Repo GitHub Pages đích. Có thể override bằng biến môi trường. */
 export const PAGES_REPO = process.env.CATKOD_PAGES_REPO ?? 'D:/GitHub/CatKod.github.io.pages';
@@ -48,6 +54,3 @@ export const PAGES_REPO = process.env.CATKOD_PAGES_REPO ?? 'D:/GitHub/CatKod.git
  * Dùng cho mọi lệnh đọc/ghi file để không phụ thuộc thư mục làm việc.
  */
 export const rel = (...parts) => path.join(ROOT, ...parts);
-
-/** Đường dẫn tương đối từ repo root, dùng để in ra log cho dễ đọc. */
-export const relToRoot = (abs) => path.relative(ROOT, abs) || '.';
