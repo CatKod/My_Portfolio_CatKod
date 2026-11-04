@@ -100,8 +100,10 @@ export const ICON_MAP = {
   Zod: { slug: 'zod', variant: 'mono' },
 
   /* --- stack embedded / AI của CatKod (đã kiểm tra tồn tại trên CDN) --- */
+  '.NET 8': { slug: 'dotnet', variant: 'mono' },
   Arduino: { slug: 'arduino', variant: 'mono' },
   'Android Studio': { slug: 'android-studio', variant: 'mono' },
+  'C#': { slug: 'csharp' },
   Docker: { slug: 'docker', variant: 'mono' },
   EasyEDA: { slug: 'easyeda', variant: 'mono' },
   FastAPI: { slug: 'fastapi', variant: 'mono' },
@@ -151,6 +153,8 @@ export const NO_ICON = new Set([
   'Bus load and jitter measurement',
   'Automated report generation (Python, Node.js)',
   'Markdown → docx', 'On-device inference (decision tree, rule-based)',
+  'Direct3D 11', 'WPF', 'USB HID', 'Windows Graphics Capture', 'IddCx',
+  'Mahony filter', 'FreeTrack', 'xUnit',
 ]);
 
 /** Trả về URL icon nếu có, hoặc null (component fallback sang chữ viết tắt). */

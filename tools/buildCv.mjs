@@ -9,6 +9,7 @@
  */
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { resolve } from 'node:path';
 import { buildCvHtml } from './cv.mjs';
 
 const OUT_DIR = 'site/pdf';
@@ -43,8 +44,11 @@ try {
       '--headless=new',
       '--disable-gpu',
       '--no-pdf-header-footer',
-      '--print-to-pdf=' + OUT.replace(/\//g, '\\'),
-      'file:///' + HTML.replace(/\\/g, '/'),
+      // Đường dẫn tuyệt đối: Chrome headless ghi PDF theo đường dẫn truyền vào,
+      // nếu là đường dẫn tương đối thì nó ghi ra file khác (hoặc bỏ qua) mà
+      // không báo lỗi — CV cũ vẫn nằm trên đĩa và tưởng như đã sinh lại.
+      '--print-to-pdf=' + resolve(OUT),
+      'file:///' + resolve(HTML).replace(/\\/g, '/'),
     ],
     { stdio: 'ignore' },
   );

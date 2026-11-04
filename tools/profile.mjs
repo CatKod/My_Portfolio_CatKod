@@ -264,22 +264,31 @@ export const projects = [
     images: [],
   },
   {
-    slug: 'smartslide-jp',
-    title: 'SmartSlide_JP',
-    year: '2025',
-    category: 'Embedded Product',
+    slug: 'rokid-max-diy-station',
+    title: 'Rokid Max · DIY Station',
+    year: '2026',
+    category: 'AR Spatial Display',
     description:
-      'A smart projector control system with a presentation remote: slide navigation, device control, and status feedback driven from a microcontroller rather than from a vendor app.',
+      'Turns Rokid Max AR glasses into a spatial Windows display: the glasses’ IMU is read over USB HID and fused into a head pose, a virtual monitor is captured through Windows.Graphics.Capture, and the desktop is re-projected as a 3D-anchored quad on the Micro-OLED that stays where you put it.',
     impact:
-      'Replaces a vendor-only workflow with a system the user controls directly.',
-    stack: ['STM32', 'IR/RF', 'Embedded UI'],
-    status: 'Completed system',
-    tech: 'STM32 + embedded UI',
-    githubUrl: 'https://github.com/CatKod/SmartSlide_JP',
+      'The panel is a real Windows display, not a recorded video — the OS does the hit-testing, focus and input, so every application works and clicks land where you expect them.',
+    stack: ['C#', '.NET 8', 'Direct3D 11', 'WPF', 'USB HID', 'Windows Graphics Capture', 'IddCx', 'Mahony filter', 'FreeTrack', 'xUnit'],
+    status: 'Released · MIT · 218 tests',
+    tech: 'C# / .NET 8',
+    githubUrl: 'https://github.com/CatKod/rokid-max-diy-station',
     liveUrl: null,
     isPrivate: false,
-    featured: false,
-    images: [],
+    featured: true,
+    images: [
+      {
+        src: '/images/projects/rokid-max-diy-station/spatial-panel.png',
+        label: 'Spatial panel as it reaches the Micro-OLED',
+      },
+      {
+        src: '/images/projects/rokid-max-diy-station/spatial-display-capture.png',
+        label: 'The captured virtual display',
+      },
+    ],
   },
 ];
 

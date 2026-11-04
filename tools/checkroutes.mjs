@@ -1,24 +1,22 @@
-const BASE = process.argv[2] || 'http://127.0.0.1:9310';
-const ROUTES = ['/', '/about', '/work', '/skills', '/credentials', '/guestbook', '/contact'];
+const urls = [
+  'https://catkod.github.io/',
+  'https://catkod.github.io/about',
+  'https://catkod.github.io/about/',
+  'https://catkod.github.io/work',
+  'https://catkod.github.io/work/',
+  'https://catkod.github.io/skills',
+  'https://catkod.github.io/credentials',
+  'https://catkod.github.io/credentials/',
+  'https://catkod.github.io/guestbook',
+  'https://catkod.github.io/contact',
+];
 
-const NEEDLES = ['Irfan', 'Sabrian', 'irfan', 'sabrian', 'Indonesia', 'Indonesi'];
-
-(async () => {
-  for (const p of ROUTES) {
-    const html = await (await fetch(BASE + p)).text();
-    const rsc = await (
-      await fetch(BASE + p + '?_rsc=abc', { headers: { RSC: '1' } })
-    ).text();
-    const ct = (await fetch(BASE + p + '?_rsc=abc', { headers: { RSC: '1' } })).headers.get(
-      'content-type'
-    );
-    const find = (s) => NEEDLES.filter((n) => s.includes(n));
-    const pushes = (html.match(/self\.__next_f\.push/g) || []).length;
-    const emptyPush = /self\.__next_f\.push\(\[1,"\\n"\]\)/.test(html);
-    console.log(
-      `${p.padEnd(12)} html=${String(html.length).padStart(7)} pushes=${String(pushes).padStart(3)}` +
-        ` emptyPush=${emptyPush} rsc=${String(rsc.length).padStart(6)} ct=${ct}` +
-        ` htmlOld=[${find(html)}] rscOld=[${find(rsc)}]`
-    );
+for (const u of urls) {
+  try {
+    const r = await fetch(u, { redirect: 'manual' });
+    const ct = r.headers.get('content-type');
+    console.log(String(r.status).padEnd(4), ct?.split(';')[0]?.padEnd(24), u);
+  } catch (e) {
+    console.log('ERR ', u, e.message);
   }
-})();
+}
