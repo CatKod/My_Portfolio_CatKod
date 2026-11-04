@@ -46,6 +46,12 @@ export const IMAGES_DIR = path.join(SITE_DIR, 'images');
 /** File CV sinh ra. */
 export const CV_PDF = path.join(PDF_DIR, 'CV_Hoang-Kim-Vinh_2026.pdf');
 
+/** Dữ liệu biểu đồ GitHub của chính CatKod — nguồn cho panel /about. */
+export const CALENDAR_FILE = path.join(TOOLS_DIR, 'data', 'calendar.json');
+
+/** HTML GitHub thô dùng để sinh lại CALENDAR_FILE. */
+export const GH_PROFILE_HTML = path.join(TOOLS_DIR, 'data', 'gh_catkod.html');
+
 /** Repo GitHub Pages đích. Có thể override bằng biến môi trường. */
 export const PAGES_REPO = process.env.CATKOD_PAGES_REPO ?? 'D:/GitHub/CatKod.github.io.pages';
 

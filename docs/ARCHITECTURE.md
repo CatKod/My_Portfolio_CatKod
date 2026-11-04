@@ -80,6 +80,7 @@ phóng xong — đây chính là lỗi làm build fail ngẫu nhiên trước kh
 | `build.mjs`     | Render markup SSR cho component động (logo loop, skill card…) |
 | `skillsFlight.mjs` | Render flight payload cho trang `/skills`                  |
 | `calendarDom.mjs`  | Render lịch đóng góp GitHub                                |
+| `pdfMeta.mjs`     | Chuẩn hoá metadata PDF để build có tính tất định         |
 | `logo.mjs`      | SVG + flight + JSX của monogram CK                           |
 | `socials.mjs`   | Ánh xạ icon/label mạng xã hội                                |
 | `common.mjs`    | Bảng thay thế chung (dùng `profile.mjs`)                     |
@@ -145,6 +146,26 @@ Repo đích: biến môi trường `CATKOD_PAGES_REPO`, mặc định
 `site.orig.bak/` bị gitignore (4.4 MB) nên **clone repo mới không build được**.
 Chạy `node tools/bootstrap.mjs` để tải lại 52 file gốc từ upstream theo
 `tools/config/origin-manifest.json`.
+
+### 5.1 Tính tất định (determinism)
+
+Build phải cho ra **cùng một output byte-for-byte** mỗi lần chạy, nếu không
+thì không kiểm chứng được "sửa X có làm hỏng Y" và git tree luôn bẩn.
+
+Có hai chỗ vốn vi phạm điều đó, đã sửa:
+
+| Nguồn | Vấn đề | Cách sửa |
+|---|---|---|
+| Trang `/about` | Upstream nhúng **biểu đồ GitHub sống** của Irfan Sabrian — số liệu đổi mỗi ngày (`totalContributions` 866 → 885), nên mỗi lần bootstrap ra một kết quả khác | Truyền `tools/data/calendar.json` (dữ liệu GitHub **của CatKod**) vào `rebrand.mjs`, thay cả panel DOM lẫn flight payload. `totalContributions` được thay bằng regex thay vì hardcode |
+| CV PDF | Chrome headless ghi `/CreationDate`, `/ModDate` theo thời điểm chạy | `tools/lib/pdfMeta.mjs` ghi đè 2 chuỗi ngày bằng mốc cố định, giữ nguyên độ dài nên xref table vẫn hợp lệ |
+
+Kiểm chứng:
+
+```bash
+node tools/bootstrap.mjs && node tools/build/buildSite.mjs   # lần 1
+node tools/bootstrap.mjs && node tools/build/buildSite.mjs   # lần 2
+git status --short site/    # phải rỗng (trừ lần đầu khi đổi nội dung)
+```
 
 ## 6. Quy ước
 

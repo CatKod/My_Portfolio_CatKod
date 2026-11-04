@@ -450,13 +450,42 @@ function doHome(parts) {
 function doAbout(parts, calendar) {
   // Calendar GitHub: thay TRƯỚC khi áp COMMON, vì COMMON sẽ đổi "Irfan" ->
   // tên và làm mất các chuỗi gốc cần khớp ("login", "profileUrl").
+  //
+  // `calendar` là dữ liệu GitHub CỦA CHÍNH CatKod (tools/data/calendar.json),
+  // sinh từ tools/verify/calendar.mjs. Không có nó thì trang /about sẽ hiện
+  // biểu đồ contribution của Irfan Sabrian — và còn không tái lập được, vì
+  // upstream đổi số liệu mỗi ngày.
   if (calendar) {
     parts = replaceAll(parts, [
       ['"login":"IrfanSabrian"', `"login":"${profile.handle}"`],
-      [`"totalContributions":885`, `"totalContributions":${calendar.totalContributions}`],
       ['"profileUrl":"https://github.com/IrfanSabrian"', `"profileUrl":"${profile.links.github}"`],
     ]);
+    // `totalContributions` của upstream thay đổi theo thời gian (866, 885, ...)
+    // nên phải thay bằng regex, không hardcode một con số.
+    parts = parts.map((p) =>
+      p.kind === 'flight'
+        ? {
+            ...p,
+            text: p.text.replace(
+              /"totalContributions":\d+/g,
+              `"totalContributions":${calendar.totalContributions}`,
+            ),
+          }
+        : p,
+    );
     parts = replaceFlightArray(parts, 'weeks', calendar.weeks);
+    // Khoảng thời gian của biểu đồ cũng phải theo CatKod, không theo upstream.
+    parts = parts.map((p) =>
+      p.kind === 'flight'
+        ? {
+            ...p,
+            text: p.text
+              .replace(/"from":"[^"]*"/g, `"from":"${calendar.from}"`)
+              .replace(/"generatedAt":"[^"]*"/g, `"generatedAt":"${calendar.generatedAt}"`)
+              .replace(/"to":"[^"]*"/g, `"to":"${calendar.to}"`),
+          }
+        : p,
+    );
     parts = replaceByClass(parts, 'contribution-panel', () => buildPanel(calendar));
   }
 

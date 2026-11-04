@@ -13,6 +13,7 @@ import { execFileSync } from 'node:child_process';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildCvHtml } from '../lib/cv.mjs';
+import { normalizePdfFile } from '../lib/pdfMeta.mjs';
 
 const OUT_DIR = PDF_DIR;
 const OUT = CV_PDF;
@@ -54,6 +55,8 @@ try {
     ],
     { stdio: 'ignore' },
   );
+  // Chuẩn hoá metadata để PDF có tính tất định (xem tools/lib/pdfMeta.mjs).
+  normalizePdfFile(OUT);
   console.log('đã tạo', OUT);
 } catch {
   console.log('không xuất được PDF — bỏ qua bước sinh CV PDF');

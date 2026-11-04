@@ -1,10 +1,30 @@
 /**
  * Sinh dữ liệu lịch đóng góp GitHub cho CatKod từ HTML thật.
  * Kết quả khớp cấu trúc mà component GitHubActivity mong đợi.
+ *
+ * Dùng:  node tools/verify/calendar.mjs
+ *   - đọc  : tools/data/gh_catkod.html  (HTML GitHub thô, tải tay từ
+ *             https://github.com/CatKod?tab=overview&from=2025-10-26&to=2026-10-31)
+ *   - ghi   : tools/data/calendar.json
+ *
+ * `gh_catkod.html` là input thô tải tay từ GitHub nên KHÔNG commit (nó thay
+ * đổi theo thời gian). Bản đã phân tích (`calendar.json`) thì có commit, nên
+ * clone repo mới vẫn build được mà không cần file thô. Script này chỉ cần
+ * chạy lại khi muốn cập nhật số liệu contribution.
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { GH_PROFILE_HTML, CALENDAR_FILE } from '../config/paths.mjs';
 
-const html = readFileSync(process.argv[2] || 'gh_catkod.html', 'utf8');
+if (!existsSync(GH_PROFILE_HTML)) {
+  console.error(
+    `thiếu ${GH_PROFILE_HTML}\n` +
+      'Tải trang GitHub (mở devtools > copy outerHTML) rồi lưu vào file đó,\n' +
+      'hoặc bỏ qua bước này — calendar.json đã commit sẵn trong repo.',
+  );
+  process.exit(1);
+}
+
+const html = readFileSync(GH_PROFILE_HTML, 'utf8');
 
 const LEVEL_COLOR = {
   0: '#ebedf0',
@@ -68,7 +88,8 @@ const calendar = {
   })),
 };
 
-writeFileSync(process.argv[3] || 'calendar.json', JSON.stringify(calendar, null, 2), 'utf8');
+writeFileSync(CALENDAR_FILE, JSON.stringify(calendar, null, 2), 'utf8');
 console.log('weeks', weeks.length, 'days', cells.length, 'total', total);
 console.log('first', first, 'last', last);
 console.log('week0', JSON.stringify(calendar.weeks[0].contributionDays));
+console.log('-> ' + CALENDAR_FILE);

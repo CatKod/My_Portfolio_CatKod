@@ -26,7 +26,7 @@
  * nên `node tools/build/buildSite.mjs` chạy được từ bất kỳ thư mục nào.
  */
 import { execFileSync } from 'node:child_process';
-import { SITE_DIR, ORIG_DIR } from '../config/paths.mjs';
+import { SITE_DIR, ORIG_DIR, CALENDAR_FILE } from '../config/paths.mjs';
 import { existsSync, mkdirSync, cpSync, rmSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { runTool } from '../lib/exec.mjs';
@@ -37,7 +37,7 @@ const step = (name, fn) => {
 };
 
 /** Chạy một script trong `tools/`, tìm theo đường dẫn tương đối từ `tools/`. */
-const run = (script) => runTool(script);
+const run = (script, ...args) => runTool(script, ...args);
 
 step('0/9 dừng server đang chạy', () => {
   // Server giữ file trong site/ khiến Node không ghi lại được trên Windows.
@@ -75,7 +75,8 @@ step('1/9 reset chunk về bản gốc', () => {
   console.log('đã khôi phục chunk gốc');
 });
 
-step('2/9 rebrand (HTML + DOM + flight + chunk)', () => run('build/rebrand.mjs'));
+step('2/9 rebrand (HTML + DOM + flight + chunk)', () =>
+  run('build/rebrand.mjs', CALENDAR_FILE));
 step('3/9 patch credential link (client bundle)', () => run('build/patchCredLink.mjs'));
 step('4/9 đồng bộ icon map client', () => run('build/synciconmap.mjs'));
 step('5/9 vá CSS (mất chữ trên desktop + thẻ ảnh chân dung)', () => run('build/patchCss.mjs'));

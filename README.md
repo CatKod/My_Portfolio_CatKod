@@ -52,6 +52,15 @@ docs/
 `tools/data/icons.mjs` — ánh xạ tên công nghệ → icon SVG trên CDN. Bản client
 được đồng bộ tự động bởi `build/synciconmap.mjs` (tránh hydration mismatch).
 
+`tools/data/calendar.json` — dữ liệu biểu đồ GitHub **của CatKod**, dùng cho
+trang `/about`. Đây là dữ liệu tĩnh đã commit nên build luôn tái lập được; nếu
+thiếu nó, trang `/about` sẽ mọc biểu đồ contribution của Irfan Sabrian (và
+số liệu đó đổi mỗi ngày → mỗi lần build ra một kết quả khác). Cập nhật bằng:
+
+```bash
+node tools/verify/calendar.mjs   # cần tools/data/gh_catkod.html (tải tay từ GitHub)
+```
+
 ### Luồng xử lý yêu cầu (server Kotlin)
 
 1. **Trang dữ liệu sống** (`/about` — biểu đồ hoạt động GitHub): lấy trực tiếp từ site gốc,
