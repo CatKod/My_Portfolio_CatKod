@@ -15,18 +15,37 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 
-/** Mốc thời gian cố định cho metadata PDF. */
-const FIXED_DATE = "D:20260101000000+00'00'";
+/** Mốc thời gian cố định: 2026-01-01 00:00:00. */
+const FIXED_STAMP = '20260101000000';
 
 /**
- * Cắt/pad một chuỗi về đúng độ dài mong muốn.
- * PDF date luôn có dạng `D:YYYYMMDDHHmmSS+HH'mm'` nên độ dài là cố định, nhưng
- * để chắc chắn ta vẫn giữ đúng độ dài chuỗi gốc thay vì hy vọng.
+ * Chuẩn hoá một giá trị date PDF về đúng độ dài ban đầu.
+ *
+ * PDF date có dạng `D:YYYYMMDDHHmmSS` + hậu tố múi giờ (`+00'00'`, `Z`, `+00`).
+ * Ta chỉ thay **14 chữ số đầu** (phần ngày-giờ) và giữ nguyên hậu tố, nên:
+ *   - độ dài không đổi → xref vẫn hợp lệ;
+ *   - hậu tố múi giờ giữ nguyên → vẫn là date PDF hợp lệ.
+ *
+ * @param {string} raw giá trị gốc, ví dụ `D:20261104145127+00'00'`
+ * @returns {string}
  */
-function fitLength(text, len) {
-  if (text.length === len) return text;
-  if (text.length > len) return text.slice(0, len);
-  return text + '0'.repeat(len - text.length);
+export function fixPdfDate(raw) {
+  const m = /^D:(\d{14})(.*)$/.exec(raw);
+  if (m) return `D:${FIXED_STAMP}${m[2]}`;
+
+  // Định dạng lạ (thiếu chữ số): thay tối đa 14 chữ số liên tiếp đầu tiên,
+  // giữ nguyên phần còn lại và độ dài.
+  let out = '';
+  let digits = 0;
+  for (const ch of raw) {
+    if (digits < 14 && ch >= '0' && ch <= '9') {
+      out += FIXED_STAMP[digits];
+      digits++;
+    } else {
+      out += ch;
+    }
+  }
+  return out;
 }
 
 /**
@@ -40,11 +59,9 @@ export function normalizePdfDates(buf) {
     const re = new RegExp(`/${key}\\s*\\(D:[^)]*\\)`, 'g');
     out = Buffer.from(
       out.toString('latin1').replace(re, (match) => {
-        // giữ nguyên phần "/Key (" và ")" quanh giá trị
         const inner = /\((D:[^)]*)\)/.exec(match);
         if (!inner) return match;
-        const fixed = fitLength(FIXED_DATE, inner[1].length);
-        return match.replace(inner[1], fixed);
+        return match.replace(inner[1], fixPdfDate(inner[1]));
       }),
       'latin1',
     );

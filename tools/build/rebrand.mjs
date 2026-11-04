@@ -460,32 +460,31 @@ function doAbout(parts, calendar) {
       ['"login":"IrfanSabrian"', `"login":"${profile.handle}"`],
       ['"profileUrl":"https://github.com/IrfanSabrian"', `"profileUrl":"${profile.links.github}"`],
     ]);
-    // `totalContributions` của upstream thay đổi theo thời gian (866, 885, ...)
-    // nên phải thay bằng regex, không hardcode một con số.
-    parts = parts.map((p) =>
-      p.kind === 'flight'
-        ? {
-            ...p,
-            text: p.text.replace(
-              /"totalContributions":\d+/g,
-              `"totalContributions":${calendar.totalContributions}`,
-            ),
-          }
-        : p,
-    );
     parts = replaceFlightArray(parts, 'weeks', calendar.weeks);
-    // Khoảng thời gian của biểu đồ cũng phải theo CatKod, không theo upstream.
-    parts = parts.map((p) =>
-      p.kind === 'flight'
-        ? {
-            ...p,
-            text: p.text
-              .replace(/"from":"[^"]*"/g, `"from":"${calendar.from}"`)
-              .replace(/"generatedAt":"[^"]*"/g, `"generatedAt":"${calendar.generatedAt}"`)
-              .replace(/"to":"[^"]*"/g, `"to":"${calendar.to}"`),
-          }
-        : p,
-    );
+    // `totalContributions` / `from` / `generatedAt` / `to` của upstream thay đổi
+    // theo thời gian (866, 885, ...) nên phải thay bằng regex, không hardcode.
+    //
+    // CHỈ thay trong object "calendar" — không thay toàn cục. Nếu thay toàn cục
+    // thì một component khác có key trùng tên (`from`/`to` rất dễ trùng: khoảng
+    // thời gian công việc, học vấn, chuyển động animation...) sẽ bị ghi đè âm
+    // thầm. Object calendar luôn nằm ngay sau `"calendar":{`.
+    parts = parts.map((p) => {
+      if (p.kind === 'raw') return p;
+      const i = p.text.indexOf('"calendar":{');
+      if (i < 0) return p;
+      const head = p.text.slice(0, i);
+      const tail = p.text.slice(i);
+      return {
+        ...p,
+        text:
+          head +
+          tail
+            .replace(/"totalContributions":\d+/, `"totalContributions":${calendar.totalContributions}`)
+            .replace(/"from":"[^"]*"/, `"from":"${calendar.from}"`)
+            .replace(/"generatedAt":"[^"]*"/, `"generatedAt":"${calendar.generatedAt}"`)
+            .replace(/"to":"[^"]*"/, `"to":"${calendar.to}"`),
+      };
+    });
     parts = replaceByClass(parts, 'contribution-panel', () => buildPanel(calendar));
   }
 
@@ -945,7 +944,7 @@ function doContact(parts) {
 function rebrandChunks() {
   const dir = CHUNKS_DIR;
   if (!existsSync(dir)) return;
-  const files = readdirSync(dir).filter((f) => f.endsWith('.js'));
+  const files = readdirSync(dir).filter((f) => f.endsWith('.js')).sort();
   const table = [
     ['Loading Irfan Sabrian portfolio', `Loading ${profile.name} portfolio`],
     ['Irfan Sabrian / 2026', `${profile.name} / 2026`],

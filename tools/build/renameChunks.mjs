@@ -96,7 +96,7 @@ function rewriteRefs(text, map) {
 //    File đã mang tên `.catkod.<hash>` từ lần build trước được đưa về tên gốc
 //    để so sánh với site.orig.bak cho đúng.
 // ---------------------------------------------------------------------------
-const marked = readdirSync(chunkDir).filter((f) => MARK_RE.test(f));
+const marked = readdirSync(chunkDir).filter((f) => MARK_RE.test(f)).sort();
 for (const f of marked) {
   const p = join(chunkDir, f);
   const data = readFileSafe(p);
@@ -105,7 +105,7 @@ for (const f of marked) {
   if (!existsSync(join(chunkDir, back))) writeFileSafe(join(chunkDir, back), data);
 }
 
-const files = readdirSync(chunkDir).filter((f) => /\.(js|css)$/.test(f));
+const files = readdirSync(chunkDir).filter((f) => /\.(js|css)$/.test(f)).sort();
 if (!files.length) {
   console.log('không có chunk nào trong ' + chunkDir);
   process.exit(0);
@@ -252,7 +252,7 @@ if (legacyAliases.length) {
 // 8. Cập nhật tham chiếu toàn site
 // ---------------------------------------------------------------------------
 function walk(dir, out = []) {
-  for (const e of readdirSync(dir, { withFileTypes: true })) {
+  for (const e of readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
     const p = join(dir, e.name);
     if (e.isDirectory()) walk(p, out);
     else out.push(p);

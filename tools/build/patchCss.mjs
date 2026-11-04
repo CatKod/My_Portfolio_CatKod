@@ -70,7 +70,7 @@ import { readFileSafe, writeFileSafe } from '../lib/writeSafe.mjs';
 import { join } from 'node:path';
 
 const dir = CHUNKS_DIR;
-const files = readdirSync(dir).filter((f) => f.endsWith('.css'));
+const files = readdirSync(dir).filter((f) => f.endsWith('.css')).sort();
 
 /**
  * Mỗi patch: [đoạn cũ, đoạn mới].

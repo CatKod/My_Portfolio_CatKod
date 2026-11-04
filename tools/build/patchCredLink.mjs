@@ -13,7 +13,7 @@ import { CHUNKS_DIR } from '../config/paths.mjs';
 import { readFileSafe, writeFileSafe } from '../lib/writeSafe.mjs';
 
 const dir = CHUNKS_DIR;
-const files = readdirSync(dir).filter((f) => f.endsWith('.js'));
+const files = readdirSync(dir).filter((f) => f.endsWith('.js')).sort();
 
 const OLD_HEAD =
   'function({record:e,variant:o="default"}){let[l,s]=(0,r.useState)(!1),d=(0,r.useCallback)(()=>s(!1),[]);return(0,t.jsxs)(t.Fragment,{children:[(0,t.jsxs)("button",{"aria-label":`Preview PDF: ${e.title}`,';

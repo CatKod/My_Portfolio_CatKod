@@ -13,7 +13,7 @@ import { readFileSafe, writeFileSafe } from '../lib/writeSafe.mjs';
 import { ICON_MAP } from '../data/icons.mjs';
 
 const dir = CHUNKS_DIR;
-const files = readdirSync(dir).filter((f) => f.endsWith('.js'));
+const files = readdirSync(dir).filter((f) => f.endsWith('.js')).sort();
 
 let patched = 0;
 for (const file of files) {
