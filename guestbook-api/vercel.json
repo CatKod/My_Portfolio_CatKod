@@ -4,11 +4,5 @@
     "api/guestbook.js": {
       "maxDuration": 10
     }
-  },
-  "rewrites": [
-    {
-      "source": "/api/guestbook",
-      "destination": "/api/guestbook"
-    }
-  ]
+  }
 }
