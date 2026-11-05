@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Hoàng Kim Vĩnh — Kỹ sư Firmware Nhúng</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 210mm;
+      height: 297mm;
+      margin: 0;
+      padding: 0;
+      background: #F0F0F0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      font-family: 'Noto Sans', 'Segoe UI', Arial, sans-serif;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    .cv-container {
+      width: 210mm;
+      height: 297mm;
+      max-height: 297mm;
+      overflow: hidden;
+      display: flex;
+      flex-direction: row;
+      background: #FFFFFF;
+      position: relative;
+    }
+
+    /* TYPOGRAPHY HELPERS */
+    .mono {
+      font-family: 'Cascadia Mono', Consolas, 'Courier New', monospace;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ==========================================================================
+       LEFT RAIL (GRAPHITE INSTRUMENT RAIL)
+       ========================================================================== */
+    .cv-left-rail {
+      width: 65mm;
+      min-width: 65mm;
+      max-width: 65mm;
+      height: 297mm;
+      background: #8C1418;
+      color: #FFFFFF;
+      padding: 5.2mm 5.5mm 6mm 6mm;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      border-right: 1px solid #6E0F12;
+      z-index: 10;
+      justify-content: space-between;
+    }
+
+    /* Signal Rail PCB Trace (Decorative Flourish) */
+    .pcb-trace {
+      position: absolute;
+      top: 57mm;
+      bottom: 20mm;
+      right: 3mm;
+      width: 2px;
+      background: #F7B9BD;
+      opacity: 0.55;
+      border-radius: 1px;
+    }
+
+    /* Identity block (name + role, moved from the canvas header band) */
+    .rail-identity {
+      margin-bottom: 3.4mm;
+    }
+    .rail-name {
+      font-size: 15pt;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      line-height: 1.05;
+      margin-bottom: 0.9mm;
+    }
+    .rail-role {
+      font-size: 7.8pt;
+      font-weight: 700;
+      color: #F7B9BD;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    /* Photo block */
+    .rail-photo-wrap {
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 4.2mm;
+    }
+    .rail-photo {
+      width: 38mm;
+      height: 38mm;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 2px;
+      display: block;
+    }
+
+    /* Rail Section Common */
+    .rail-section {
+      margin-bottom: 4.2mm;
+      position: relative;
+    }
+    .rail-section-header {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 1.6mm;
+    }
+    .rail-section-title {
+      font-size: 8.0pt;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #FFFFFF;
+    }
+    .rail-section-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      flex-shrink: 0;
+    }
+
+    /* Contact Block */
+    .contact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.7mm;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 7.2pt;
+      color: #FFFFFF;
+      line-height: 1.15;
+    }
+    .contact-icon {
+      width: 9.5px;
+      height: 9.5px;
+      stroke: #FFFFFF;
+      stroke-width: 1.7;
+      fill: none;
+      flex-shrink: 0;
+    }
+    .contact-link {
+      color: #FFFFFF;
+      word-break: break-all;
+    }
+    .contact-link:hover {
+      color: #F7B9BD;
+      text-decoration: underline;
+    }
+
+    /* Education Block */
+    .edu-degree {
+      font-size: 7.8pt;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.2;
+      margin-bottom: 0.5mm;
+    }
+    .edu-meta {
+      font-size: 7.0pt;
+      color: #E5BFC1;
+      line-height: 1.2;
+      margin-bottom: 1.0mm;
+      display: flex;
+      justify-content: space-between;
+    }
+    .edu-detail {
+      font-size: 6.85pt;
+      color: #E5BFC1;
+      line-height: 1.2;
+    }
+
+    /* Skills Block */
+    .skills-group {
+      margin-bottom: 2.4mm;
+    }
+    .skills-group:last-child {
+      margin-bottom: 0;
+    }
+    .skills-group-label {
+      font-size: 7.1pt;
+      font-weight: 700;
+      color: #F7B9BD;
+      margin-bottom: 0.25mm;
+      letter-spacing: -0.01em;
+    }
+    .skills-items {
+      font-size: 6.85pt;
+      color: #FFFFFF;
+      line-height: 1.2;
+    }
+    .skills-items .proto {
+      font-family: 'Cascadia Mono', Consolas, 'Courier New', monospace;
+      color: #E5BFC1;
+      font-size: 6.7pt;
+    }
+
+    /* Languages Block */
+    .lang-item {
+      margin-bottom: 1.7mm;
+    }
+    .lang-item:last-child {
+      margin-bottom: 0;
+    }
+    .lang-header {
+      display: flex;
+      font-size: 7.0pt;
+      color: #FFFFFF;
+      margin-bottom: 0.55mm;
+      line-height: 1;
+    }
+
+    /* ==========================================================================
+       RIGHT CANVAS (WHITE SCHEMATIC CANVAS)
+       ========================================================================== */
+    .cv-right-canvas {
+      width: 145mm;
+      min-width: 145mm;
+      max-width: 145mm;
+      height: 297mm;
+      background: #FFFFFF;
+      color: #33393F;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Main Content Body */
+    .canvas-body {
+      padding: 4.6mm 6.5mm 4.5mm 6.5mm;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    /* Section spacing (rebalanced) */
+    .canvas-section { margin-bottom: 0; }
+    .canvas-section:last-child { margin-bottom: 0; }
+
+    /* Canvas Section Headers */
+    .section-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 1.1mm;
+      margin-bottom: 0.7mm;
+    }
+    .section-icon {
+      width: 11px;
+      height: 11px;
+      stroke: #C1272D;
+      stroke-width: 1.7;
+      fill: none;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 8.2pt;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #8C1418;
+      text-transform: none;
+      white-space: nowrap;
+    }
+    .section-rule {
+      height: 1px;
+      background: #E8D3D4;
+      flex-grow: 1;
+    }
+
+    /* PROFILE */
+    .profile-text {
+      font-size: 7.2pt;
+      line-height: 1.16;
+      color: #33393F;
+      margin-bottom: 0.4mm;
+    }
+    .profile-text:last-child {
+      margin-bottom: 0;
+    }
+
+    /* EXPERIENCE TIMELINE */
+    .experience-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9mm;
+    }
+    .timeline-entry {
+      display: flex;
+      position: relative;
+    }
+    .timeline-gutter {
+      width: 19mm;
+      min-width: 19mm;
+      max-width: 19mm;
+      padding-right: 2.2mm;
+      text-align: right;
+      font-size: 6.7pt;
+      color: #6B7480;
+      line-height: 1.16;
+      padding-top: 0.5px;
+    }
+    .timeline-spine {
+      width: 1px;
+      background: #E8D3D4;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .timeline-node {
+      position: absolute;
+      top: 3px;
+      left: -2px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #C1272D;
+    }
+    .timeline-content {
+      padding-left: 2.6mm;
+      flex-grow: 1;
+    }
+    .exp-header {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 0.1mm;
+    }
+    .exp-org {
+      font-size: 7.7pt;
+      font-weight: 700;
+      color: #14191F;
+    }
+    .exp-divider {
+      color: #6B7480;
+      font-size: 7pt;
+    }
+    .exp-role {
+      font-size: 7.2pt;
+      font-weight: 600;
+      color: #B32028;
+    }
+    .exp-intro {
+      font-size: 7.0pt;
+      color: #33393F;
+      line-height: 1.14;
+      margin-bottom: 0.25mm;
+    }
+    .exp-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25mm;
+    }
+    .exp-bullet-item {
+      position: relative;
+      padding-left: 2.2mm;
+      font-size: 6.95pt;
+      line-height: 1.15;
+      color: #33393F;
+    }
+    .exp-bullet-item::before {
+      content: '';
+      position: absolute;
+      left: 0.2mm;
+      top: 3.6px;
+      width: 2px;
+      height: 2px;
+      background: #6B7480;
+      border-radius: 50%;
+    }
+
+    /* PROJECTS */
+    .projects-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75mm;
+    }
+    .project-entry {
+      border-bottom: 1px solid #EEDCDC;
+      padding-bottom: 0.55mm;
+    }
+    .project-entry:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .project-header {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 0.2mm;
+    }
+    .project-title {
+      font-size: 7.5pt;
+      font-weight: 700;
+      color: #14191F;
+    }
+    .project-badge {
+      font-size: 6.2pt;
+      font-weight: 600;
+      color: #B32028;
+      background: #FBE9EA;
+      padding: 0.5px 3.2px;
+      border-radius: 2px;
+      line-height: 1.2;
+    }
+    .project-desc {
+      font-size: 6.9pt;
+      line-height: 1.14;
+      color: #33393F;
+      margin-bottom: 0.2mm;
+    }
+    .project-url {
+      font-size: 6.5pt;
+      color: #6B7480;
+      display: inline-block;
+      line-height: 1.1;
+    }
+    .project-url:hover {
+      color: #C1272D;
+      text-decoration: underline;
+    }
+
+    /* CHỨNG CHỈ */
+    .certs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5mm;
+    }
+    .cert-item-full {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      margin-bottom: 0.15mm;
+    }
+    .cert-title {
+      font-size: 7.3pt;
+      font-weight: 700;
+      color: #14191F;
+    }
+    .cert-issuer {
+      font-size: 6.5pt;
+      color: #6B7480;
+    }
+    .cert-card {
+      background: #FDF8F8;
+      border: 1px solid #EEDCDC;
+      border-radius: 2px;
+      padding: 0.75mm 1.4mm;
+    }
+    .cert-card-title {
+      font-size: 7.0pt;
+      font-weight: 700;
+      color: #14191F;
+      line-height: 1.12;
+    }
+    .cert-card-meta {
+      font-size: 6.3pt;
+      color: #6B7480;
+      margin-bottom: 0.3mm;
+    }
+    .cert-sublist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15mm;
+    }
+    .cert-subitem {
+      font-size: 6.45pt;
+      color: #33393F;
+      position: relative;
+      padding-left: 2mm;
+      line-height: 1.12;
+    }
+    .cert-subitem::before {
+      content: '–';
+      position: absolute;
+      left: 0;
+      color: #C1272D;
+    }
+  </style>
+</head>
+<body>
+  <div class="cv-container">
+    
+    <!-- ====================================================================
+         LEFT RAIL (GRAPHITE INSTRUMENT RAIL)
+         ==================================================================== -->
+    <aside class="cv-left-rail">
+      <div class="pcb-trace" aria-hidden="true"></div>
+
+      <!-- Identity: name + role -->
+      <div class="rail-identity">
+        <h1 class="rail-name">Hoàng Kim Vĩnh</h1>
+        <div class="rail-role">Kỹ sư Firmware Nhúng</div>
+      </div>
+
+      <!-- Photo -->
+      <div class="rail-photo-wrap">
+        <img src="avatar.jpg" alt="Hoàng Kim Vĩnh" class="rail-photo">
+      </div>
+
+      <!-- Contact Block -->
+      <section class="rail-section">
+        <div class="rail-section-header">
+          <div class="rail-section-dot"></div>
+          <h2 class="rail-section-title">Liên hệ</h2>
+        </div>
+        <div class="contact-list">
+          <div class="contact-item">
+            <svg class="contact-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            <a href="mailto:kimvinhh6@gmail.com" class="contact-link mono">kimvinhh6@gmail.com</a>
+          </div>
+          <div class="contact-item">
+            <svg class="contact-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            <a href="https://catkod.github.io/" class="contact-link mono">catkod.github.io</a>
+          </div>
+          <div class="contact-item">
+            <svg class="contact-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>Hà Nội, Việt Nam</span>
+          </div>
+          <div class="contact-item">
+            <svg class="contact-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            <a href="https://www.linkedin.com/in/kim-v%C3%A9nh-ho%C3%A0ng-9a306935a/" class="contact-link">LinkedIn</a>
+          </div>
+          <div class="contact-item">
+            <svg class="contact-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+            <a href="https://github.com/CatKod" class="contact-link mono">github.com/CatKod</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Education Block -->
+      <section class="rail-section">
+        <div class="rail-section-header">
+          <div class="rail-section-dot"></div>
+          <h2 class="rail-section-title">Học vấn</h2>
+        </div>
+        <div class="edu-degree">Công nghệ Thông tin Việt Nhật</div>
+        <div class="edu-meta">
+          <span>Đại học Bách khoa Hà Nội</span>
+          <span class="mono">2023 - 2027</span>
+        </div>
+        <p class="edu-detail">Sinh viên năm cuối ngành Công nghệ Thông tin Việt Nhật, học bằng tiếng Nhật. Chuyên môn tôi hướng tới là hệ thống nhúng và IoT, xoay quanh vi điều khiển, hệ thống thời gian thực và mạng máy tính; phần học máy phục vụ cho các bài toán suy luận ngay trên thiết bị. Dẫn dắt hầu hết các dự án nhóm tham gia.</p>
+      </section>
+
+      <!-- Skills Block -->
+      <section class="rail-section">
+        <div class="rail-section-header">
+          <div class="rail-section-dot"></div>
+          <h2 class="rail-section-title">Kỹ năng</h2>
+        </div>
+        
+        <div class="skills-group">
+          <div class="skills-group-label">Giao diện nhúng</div>
+          <div class="skills-items">TouchGFX on STM32, LVGL on ESP32, GUI design tooling, <span class="proto">MIPI-DSI display interface</span>, I/O expander for touch and buttons, Layout and screen-state design</div>
+        </div>
+
+        <div class="skills-group">
+          <div class="skills-group-label">Ngôn ngữ lập trình</div>
+          <div class="skills-items">C (C99, Embedded C), C++, Python, Assembly cơ bản</div>
+        </div>
+
+        <div class="skills-group">
+          <div class="skills-group-label">Firmware &amp; RTOS</div>
+          <div class="skills-items">STM32 Cortex-M series, STM32Cube HAL, Bare-metal register work, Hierarchical state machines, Non-blocking + soft timers, FreeRTOS, ESP-IDF, PlatformIO, Bootloader / IAP, USB Host, FATFS</div>
+        </div>
+
+        <div class="skills-group">
+          <div class="skills-group-label">Giao thức</div>
+          <div class="skills-items"><span class="proto">CAN 2.0B 29-bit</span>, <span class="proto">FDCAN</span>, <span class="proto">SPI-to-CAN bridge</span>, <span class="proto">OCPP</span>, <span class="proto">GB/T 27930</span>, <span class="proto">DLT-645</span>, <span class="proto">MQTT - topic design, QoS, retain, LWT</span>, <span class="proto">UART / RS485 / Modbus</span>, SPI Ethernet controller, Wi-Fi provisioning, Framed ASCII protocol with checksum + resync</div>
+        </div>
+
+        <div class="skills-group">
+          <div class="skills-group-label">Phần cứng &amp; công suất</div>
+          <div class="skills-items">EasyEDA Pro, Contactor, power module, current/voltage ramping, Insulation monitoring (IMD), Safe sequential switching, Logic analyser, Fault injection, Shift register for LED bus, RTD temperature sensing</div>
+        </div>
+
+        <div class="skills-group">
+          <div class="skills-group-label">AI biên &amp; Ứng dụng</div>
+          <div class="skills-items">Computer vision, PyTorch, On-device inference, OpenCV, Python, FastAPI, TypeScript, NestJS, PostgreSQL, Flutter, React</div>
+        </div>
+      </section>
+
+      <!-- Languages Block -->
+      <section class="rail-section">
+        <div class="rail-section-header">
+          <div class="rail-section-dot"></div>
+          <h2 class="rail-section-title">Ngôn ngữ</h2>
+        </div>
+        <div class="lang-item">
+          <div class="lang-header">
+            <span>Tiếng Nhật (JLPT N3)</span>
+          </div>
+        </div>
+        <div class="lang-item">
+          <div class="lang-header">
+            <span>Tiếng Việt (Bản ngữ)</span>
+          </div>
+        </div>
+        <div class="lang-item">
+          <div class="lang-header">
+            <span>Tiếng Anh (Trình độ giao tiếp)</span>
+          </div>
+        </div>
+      </section>
+
+    </aside>
+
+
+
+
+
+    <!-- ====================================================================
+         RIGHT CANVAS (WHITE SCHEMATIC CANVAS)
+         ==================================================================== -->
+    <main class="cv-right-canvas">
+
+      <!-- Main Canvas Body -->
+      <div class="canvas-body">
+        
+        <!-- PROFILE -->
+        <section class="canvas-section">
+          <div class="section-title-wrap">
+            <svg class="section-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <h2 class="section-title">Hồ sơ</h2>
+            <div class="section-rule"></div>
+          </div>
+          <p class="profile-text">Tôi là sinh viên năm cuối ngành Công nghệ Thông tin Việt Nhật tại Đại học Bách khoa Hà Nội, với định hướng chuyên môn là hệ thống nhúng và IoT. Phần lớn công việc firmware của tôi diễn ra tại Phòng thí nghiệm APES, nơi tôi tham gia phát triển trạm sạc ô tô thương mại được phát triển cùng một nhà sản xuất đối tác. Mã nguồn nằm dưới NDA, nhưng phạm vi kỹ thuật chính là công việc tôi làm hằng ngày.</p>
+          <p class="profile-text">Nền tảng AI của tôi được đào tạo bài bản (DeepLearning.AI × Stanford) chứ không phải tự học, và điều đó cho phép tôi chạy mô hình ngay trên thiết bị: một pipeline computer vision cho đánh giá hư hại xe ô tô, và một bộ phân loại lệnh thoại tiếng Việt chạy hoàn toàn trên ESP32-P4 mà không phụ thuộc đám mây.</p>
+        </section>
+
+        <!-- EXPERIENCE -->
+        <section class="canvas-section">
+          <div class="section-title-wrap">
+            <svg class="section-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            <h2 class="section-title">Kinh nghiệm</h2>
+            <div class="section-rule"></div>
+          </div>
+
+          <div class="experience-list">
+            <!-- Entry 1 -->
+            <article class="timeline-entry">
+              <div class="timeline-gutter mono">Hiện tại</div>
+              <div class="timeline-spine"><div class="timeline-node"></div></div>
+              <div class="timeline-content">
+                <div class="exp-header">
+                  <span class="exp-org">APES Lab</span>
+                  <span class="exp-divider">/</span>
+                  <span class="exp-role">Kỹ sư Firmware Nhúng - Trạm Sạc Ô Tô</span>
+                </div>
+                <p class="exp-intro">Tham gia phát triển trạm sạc ô tô thương mại cùng một nhà sản xuất đối tác. Mã nguồn nằm dưới NDA, nên phạm vi dưới đây mô tả trách nhiệm của tôi chứ không phải cách hiện thực hoá.</p>
+                <ul class="exp-bullets">
+                  <li class="exp-bullet-item">Firmware chia sẻ công suất cho mạng sạc xe điện dạng vòng - STM32H723, CAN 2.0B 29-bit qua MCP2515 chuyển SPI sang CAN, tối đa 32 súng sạc trên 16 tủ.</li>
+                  <li class="exp-bullet-item">Thuật toán phân bổ và thu hồi công suất phân tán - firmware tự động mượn công suất từ các súng sạc nhàn rồi thu hồi lại khi cần.</li>
+                  <li class="exp-bullet-item">Kiến trúc bốn tầng: Ứng dụng -&gt; Tầng trung gian (Dịch vụ / FSM / Điều khiển) -&gt; Driver -&gt; HAL, với lệnh gọi chỉ đi theo chiều lên và được áp dụng nghiêm ngặt.</li>
+                  <li class="exp-bullet-item">Quy trình phân tích tĩnh MISRA C:2012 (cppcheck với addon tự viết) và kiểm thử đơn vị trên PC với HAL được giả lập.</li>
+                  <li class="exp-bullet-item">Thiết kế firmware không blocking - không dùng HAL_Delay() ở bất cứ đâu; mọi định thời gian đến từ mảng timer mềm 1 ms.</li>
+                  <li class="exp-bullet-item">Firmware bộ sạc ô tô hai súng - OCPP, giao tiếp phía xe theo GB/T 27930, đo lượng điện DC theo DLT-645, bộ điều khiển Ethernet WIZnet, RFID, giám sát cách điện, USB Host với FATFS, bootloader / IAP.</li>
+                </ul>
+              </div>
+            </article>
+
+            <!-- Entry 2 -->
+            <article class="timeline-entry">
+              <div class="timeline-gutter mono">Thực tập Hè</div>
+              <div class="timeline-spine"><div class="timeline-node"></div></div>
+              <div class="timeline-content">
+                <div class="exp-header">
+                  <span class="exp-org">Yootek</span>
+                  <span class="exp-divider">/</span>
+                  <span class="exp-role">Kỹ sư Firmware IoT</span>
+                </div>
+                <p class="exp-intro">SmartGarden - một nền tảng IoT doanh nghiệp.</p>
+                <ul class="exp-bullets">
+                  <li class="exp-bullet-item">Firmware ESP32 trên ESP-IDF, phát trạng thái cảm biến qua MQTT.</li>
+                  <li class="exp-bullet-item">Backend NestJS với PostgreSQL và Prisma, WebSocket cho cập nhật trực tiếp.</li>
+                  <li class="exp-bullet-item">Xác thực JWT và phân quyền theo vai trò.</li>
+                </ul>
+              </div>
+            </article>
+
+            <!-- Entry 3 -->
+            <article class="timeline-entry">
+              <div class="timeline-gutter mono">2023 - 2027</div>
+              <div class="timeline-spine"><div class="timeline-node"></div></div>
+              <div class="timeline-content">
+                <div class="exp-header">
+                  <span class="exp-org">Dự án trong quá trình học</span>
+                  <span class="exp-divider">/</span>
+                  <span class="exp-role">Kỹ sư Nhúng &amp; IoT - Trưởng nhóm</span>
+                </div>
+                <p class="exp-intro">Dẫn dắt hoặc đồng dẫn dắt hầu hết các dự án nhóm từ năm nhất tới nay; dự án cá nhân hoàn thành một mình từ phần cứng, firmware đến ứng dụng. Chi tiết kỹ thuật từng dự án ở mục Dự án bên dưới.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- PROJECTS -->
+        <section class="canvas-section">
+          <div class="section-title-wrap">
+            <svg class="section-icon" aria-hidden="true" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            <h2 class="section-title">Dự án</h2>
+            <div class="section-rule"></div>
+          </div>
+
+          <div class="projects-list">
+            <!-- Project 1 -->
+            <article class="project-entry">
+              <div class="project-header">
+                <span class="project-title mono">embedded-iot-toolkit</span>
+                <span class="project-badge">Mã nguồn mở - MIT - 89 bài kiểm thử</span>
+              </div>
+              <p class="project-desc">Một thư viện C99 không phụ thuộc gồm các khối xây dựng firmware mà tôi liên tục viết lại: ngân hàng timer không blocking, giao thức serial đóng khung an toàn với ISR kèm checksum và đồng bộ lại, bộ mã hoá CAN 2.0B 29-bit với bộ giải định thời gian bit, và các bộ giải mã cảm biến báo cáo dữ liệu cũ thay vì trả về giá trị đã lỗi thời.</p>
+              <a href="https://github.com/CatKod/embedded-iot-toolkit" class="project-url mono">github.com/CatKod/embedded-iot-toolkit</a>
+            </article>
+            <!-- Project 2 -->
+            <article class="project-entry">
+              <div class="project-header">
+                <span class="project-title mono">rokid-max-diy-station</span>
+                <span class="project-badge">Mã nguồn mở - MIT - 218 bài kiểm thử</span>
+              </div>
+              <p class="project-desc">Kính AR Rokid Max biến thành màn hình không gian: một màn hình ảo Windows sống trong phòng chứ không bị ghim vào mắt. IMU qua USB HID được lọc Mahony thành tư thế đầu 3 bậc tự do, driver IddCx tạo màn hình thật tại toạ độ âm nên hệ điều hành tự lo hit-test và focus, Windows.Graphics.Capture chụp desktop rồi Direct3D 11 chiếu thành quad 3D neo theo tư thế đầu trên Micro-OLED.</p>
+              <a href="https://github.com/CatKod/rokid-max-diy-station" class="project-url mono">github.com/CatKod/rokid-max-diy-station</a>
+            </article>
+
+            <!-- Project 3 -->
+            <article class="project-entry">
+              <div class="project-header">
+                <span class="project-title mono">SmartHome</span>
+                <span class="project-badge">Đồ án trường - điểm 10/10</span>
+              </div>
+              <p class="project-desc">Kiến trúc hai tầng, nơi MCU thời gian thực không bao giờ phụ thuộc đám mây về an toàn. ESP32-S3 đảm nhiệm Wi-Fi và MQTT; STM32H7 nắm quyền điều khiển phần cứng. RFID và nhập mã PIN, bus LED dùng thanh ghi dịch chuyển, cảm biến môi trường và cơ cấu cửa sổ tự động.</p>
+              <a href="https://github.com/CatKod/SmartHome" class="project-url mono">github.com/CatKod/SmartHome</a>
+            </article>
+
+            <!-- Project 4 -->
+            <article class="project-entry">
+              <div class="project-header">
+                <span class="project-title mono">Smart Power Outlet</span>
+                <span class="project-badge">Đồ án tốt nghiệp - một mình</span>
+              </div>
+              <p class="project-desc">Một sản phẩm IoT hoàn chỉnh chứ không chỉ là một mạch: PCB được thiết kế trên EasyEDA Pro, firmware là ESP-IDF có Wi-Fi provisioning nên không bao giờ hardcode thông tin đăng nhập, bản dựng PlatformIO bao phủ cả ESP32 và ESP8266, và một ứng dụng Flutter đa nền tảng điều khiển thiết bị.</p>
+              <a href="https://github.com/CatKod/Smart_Power_Outlet" class="project-url mono">github.com/CatKod/Smart_Power_Outlet</a>
+            </article>
+
+            <!-- Project 5 -->
+            <article class="project-entry">
+              <div class="project-header">
+                <span class="project-title mono">Sun-Car Damage Assessment</span>
+                <span class="project-badge">Dự án học bổng SUN</span>
+              </div>
+              <p class="project-desc">Pipeline computer vision cho phát hiện vật thể, phân vùng instance và chấm điểm mức độ hư hại, xây dựng để ứng tuyển học bổng SUN. ESP32-CAM chụp khung hình và truyền kết quả tới STM32 qua UART, nên suy luận nằm ở biên thay vì trên đám mây.</p>
+              <a href="https://github.com/CatKod/Sun-Car-Damage-AI-Assessment" class="project-url mono">github.com/CatKod/Sun-Car-Damage-AI-Assessment</a>
+            </article>
+          </div>
+        </section>
+
+        <!-- CHỨNG CHỈ -->
+        <section class="canvas-section">
+          <div class="section-title-wrap">
+            <svg class="section-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+            <h2 class="section-title">Chứng chỉ</h2>
+            <div class="section-rule"></div>
+          </div>
+
+          <div class="certs-grid">
+            <div class="cert-item-full">
+              <span class="cert-title">Kỳ thi Năng lực Tiếng Nhật - N3</span>
+            </div>
+
+            <div class="cert-card">
+              <div class="cert-card-title">Chuyên sâu Học máy</div>
+              <div class="cert-card-meta mono">DeepLearning.AI × Stanford University · Tháng 4 - Tháng 5, 2025</div>
+              <ul class="cert-sublist">
+                <li class="cert-subitem">Học máy có giám sát: Hồi quy và Phân loại</li>
+                <li class="cert-subitem">Thuật toán Học nâng cao</li>
+                <li class="cert-subitem">Học không giám sát, Hệ thống gợi ý và Học tăng cường</li>
+                <li class="cert-subitem">Đồ án tốt nghiệp Học máy</li>
+              </ul>
+            </div>
+
+            <div class="cert-card">
+              <div class="cert-card-title">Chuyên sâu Học sâu</div>
+              <div class="cert-card-meta mono">DeepLearning.AI · Tháng 7, 2025</div>
+              <ul class="cert-sublist">
+                <li class="cert-subitem">Mạng nơ-ron và Học sâu</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+</body>
+</html>

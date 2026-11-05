@@ -1,0 +1,9 @@
+# File CV HTML là TÀI SẢN có sẵn (copy từ repo CatKod.github.io), không phải
+# file sinh bởi pipeline. Nếu git tự động đổi LF <-> CRLF (core.autocrlf) thì
+# byte trong `site/cv/` sẽ khác giữa các máy => build không còn tất định.
+# Vì vậy tắt hoàn toàn việc chuyển dòng cho các file này.
+tools/data/cv/* -text
+
+# Ảnh và PDF cũng là binary, không nên bị "sửa" dòng.
+tools/data/cv/*.jpg binary
+site/cv/* binary

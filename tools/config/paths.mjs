@@ -52,6 +52,15 @@ export const CALENDAR_FILE = path.join(TOOLS_DIR, 'data', 'calendar.json');
 /** HTML GitHub thô dùng để sinh lại CALENDAR_FILE. */
 export const GH_PROFILE_HTML = path.join(TOOLS_DIR, 'data', 'gh_catkod.html');
 
+/** Thư mục chứa 6 bản CV HTML nguồn (2 kiểu × 3 ngôn ngữ). */
+export const CV_SRC_DIR = path.join(TOOLS_DIR, 'data', 'cv');
+
+/** Thư mục chứa CV sau khi build (được publish cùng site). */
+export const CV_OUT_DIR = path.join(SITE_DIR, 'cv');
+
+/** Đường dẫn URL của các bản CV sau khi build. */
+export const CV_URL_BASE = '/cv';
+
 /** Repo GitHub Pages đích. Có thể override bằng biến môi trường. */
 export const PAGES_REPO = process.env.CATKOD_PAGES_REPO ?? 'D:/GitHub/CatKod.github.io.pages';
 

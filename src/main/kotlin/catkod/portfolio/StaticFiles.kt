@@ -57,6 +57,7 @@ class StaticFiles(private val root: Path) {
             ".json" -> "application/json; charset=utf-8"
             ".txt" -> "text/plain; charset=utf-8"
             ".xml" -> "application/xml; charset=utf-8"
+            ".pdf" -> "application/pdf"
             ".svg" -> "image/svg+xml"
             ".png" -> "image/png"
             ".webp" -> "image/webp"

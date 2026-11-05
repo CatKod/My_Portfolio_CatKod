@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hoàng Kim Vĩnh — CV</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    html {
+      font-size: 14px;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      background-color: #FFFFFF;
+      color: #333333;
+      font-family: 'Noto Sans JP', 'Noto Serif JP', 'Yu Gothic', 'Meiryo', 'MS Gothic', sans-serif;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .mono {
+      font-family: 'Noto Sans JP', 'Cascadia Mono', Consolas, monospace;
+    }
+
+    .cv-container {
+      width: 210mm;
+      height: 297mm;
+      max-height: 297mm;
+      margin: 0 auto;
+      background: #FFFFFF;
+      position: relative;
+      padding: 15px 44px 15px 44px; /* ~13% symmetric side margins */
+      box-sizing: border-box;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+    }
+
+    .name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1A1A1A;
+      letter-spacing: 0.04em;
+      line-height: 1.2;
+    }
+
+    .role-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: #333333;
+      margin-top: 2px;
+      line-height: 1.2;
+    }
+
+    .contact-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      margin-top: 3.5px;
+      font-size: 9.4px;
+      color: #555555;
+    }
+
+    .contact-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      text-decoration: none;
+      color: #555555;
+    }
+
+    .contact-item svg {
+      width: 10.5px;
+      height: 10.5px;
+      stroke: #666666;
+      stroke-width: 1.8;
+      fill: none;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    .header-divider {
+      height: 1.5px;
+      background-color: #8C1418;
+      border: none;
+      margin-top: 4.5px;
+      margin-bottom: 4.0px;
+      width: 100%;
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: 3.2px;
+    }
+
+    .section:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .section-heading {
+      font-size: 10.8px;
+      font-weight: 700;
+      color: #8C1418;
+      letter-spacing: 0.06em;
+      line-height: 1.25;
+    }
+
+    .section-divider {
+      height: 1px;
+      background-color: #E0C8C9;
+      border: none;
+      margin-top: 1.2px;
+      margin-bottom: 2.2px;
+      width: 100%;
+    }
+
+    /* Text & Paragraphs */
+    .body-p {
+      font-size: 8.3px;
+      line-height: 1.22;
+      color: #333333;
+      margin-bottom: 1.0px;
+      text-align: left;
+    }
+
+    .body-p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Entry styles */
+    .entry {
+      margin-bottom: 2.0px;
+    }
+
+    .entry:last-child {
+      margin-bottom: 0;
+    }
+
+    .meta-line {
+      font-size: 8.6px;
+      font-weight: 500;
+      color: #666666;
+      line-height: 1.18;
+    }
+
+    .entry-title {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #1A1A1A;
+      margin-top: 0.5px;
+      margin-bottom: 1px;
+      line-height: 1.22;
+    }
+
+    .entry-bullets {
+      list-style-type: disc;
+      margin: 1px 0 0 14px;
+      padding: 0;
+    }
+
+    .entry-bullets li {
+      font-size: 8.2px;
+      line-height: 1.20;
+      color: #333333;
+      margin-bottom: 0.6px;
+    }
+
+    .entry-bullets li:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Project badge and URL */
+    .project-badge {
+      background: #FBE9EA;
+      color: #B32028;
+      font-size: 7.6px;
+      padding: 1px 5px;
+      border-radius: 2px;
+      font-family: 'Noto Sans JP', 'Cascadia Mono', Consolas, monospace;
+      font-weight: 600;
+      vertical-align: middle;
+      display: inline-block;
+      line-height: 1.2;
+      margin-left: 5px;
+    }
+
+    .project-url {
+      font-size: 7.8px;
+      line-height: 1.12;
+    }
+
+    .project-url a {
+      color: #666666;
+      text-decoration: none;
+    }
+
+    .project-url a:hover {
+      color: #B32028;
+      text-decoration: underline;
+    }
+
+
+    /* Skills 3-column list */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      column-gap: 20px;
+      row-gap: 0.8px;
+    }
+
+    .skills-col {
+      list-style-type: disc;
+      padding-left: 13px;
+      margin: 0;
+    }
+
+    .skills-col li {
+      font-size: 8.2px;
+      line-height: 1.18;
+      color: #333333;
+      margin-bottom: 0.6px;
+    }
+
+    .skills-col li:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Languages 3-row list */
+    .lang-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.8px;
+    }
+
+    .lang-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .lang-label {
+      font-size: 9.4px;
+      line-height: 1.15;
+      color: #333333;
+    }
+
+    .lang-note {
+      font-size: 8.2px;
+      line-height: 1.25;
+      color: #555555;
+      margin-top: 1px;
+    }
+
+    /* Bottom charcoal bar */
+    .bottom-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 16px;
+      background-color: #8C1418;
+    }
+
+    /* Hidden link for compliance verification */
+    .hidden-ref {
+      display: none;
+    }
+
+    /* Responsive Mobile view (<820px) */
+    @media screen and (max-width: 820px) {
+      body {
+        background-color: #FFFFFF;
+      }
+
+      .cv-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: none !important;
+        padding: 20px 16px 36px 16px !important;
+        overflow-x: hidden !important;
+      }
+
+      .contact-row {
+        flex-wrap: wrap;
+        gap: 10px 16px;
+      }
+
+      .skills-grid {
+        grid-template-columns: 1fr;
+        row-gap: 0;
+      }
+
+      .skills-col {
+        margin-bottom: 0;
+      }
+
+      .bottom-bar {
+        position: relative;
+        margin-top: 24px;
+        height: 16px;
+      }
+    }
+
+    @media print {
+      html, body {
+        width: 210mm;
+        height: 297mm;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .cv-container {
+        width: 210mm;
+        height: 297mm;
+        max-height: 297mm;
+        overflow: hidden;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cv-container">
+    <!-- Header -->
+    <header class="header">
+      <h1 class="name">HOÀNG KIM VĨNH</h1>
+      <div class="role-title">組み込みファームウェアエンジニア</div>
+      <div class="contact-row">
+        <a class="contact-item" href="mailto:kimvinhh6@gmail.com">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <span>kimvinhh6@gmail.com</span>
+        </a>
+        <a class="contact-item" href="https://catkod.github.io/">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+          <span>catkod.github.io</span>
+        </a>
+        <span class="contact-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>ベトナム・ハノイ</span>
+        </span>
+        <a class="contact-item" href="https://www.linkedin.com/in/kim-v%C3%A9nh-ho%C3%A0ng-9a306935a/">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          <span>LinkedIn</span>
+        </a>
+        <a class="contact-item" href="https://github.com/CatKod">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77 5.44 5.44 0 0 0 3.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          <span>github.com/CatKod</span>
+        </a>
+      </div>
+      <div class="header-divider"></div>
+    </header>
+
+    <!-- 1. プロフィール -->
+    <section class="section">
+      <h2 class="section-heading">プロフィール</h2>
+      <div class="section-divider"></div>
+      <p class="body-p">ハノイ工科大学 情報技術（ベトナム語・日本語プログラム）学科の最終学年にあり、専門分野は組込みシステムと産業用 IoT です。ファームウェア関連の仕事のほとんどは APES ラボで行っており、パートナー企業と共同開発した商用 EV 充電設備の開発に参加しています。ソースコードは NDA の対象のため非公開ですが、日常的に担当している技術領域は次の通りです。</p>
+      <p class="body-p">AI に関する基盤は独学ではなく、DeepLearning.AI × Stanford の講座を通じて体系的に学びました。この基盤のおかげでモデルをデバイス上で実行でき、車体損傷評価用のコンピュータビジョンパイプライン、そしてクラウドに依存せず ESP32-P4 上だけで動作するベトナム語の音声コマンド分類器を実現しています。</p>
+      <p class="body-p">大学で培った組込み技術と日本語力を基盤とし、日本国内の開発現場においてエンジニアとして長期的に貢献することを目指しています。</p>
+    </section>
+
+    <!-- 2. 学歴 -->
+    <section class="section">
+      <h2 class="section-heading">学歴</h2>
+      <div class="section-divider"></div>
+      <div class="entry">
+        <div class="meta-line">ハノイ工科大学 | 2023 - 2027</div>
+        <div class="entry-title">情報技術（ベトナム語・日本語プログラム）</div>
+        <p class="body-p">情報技術（ベトナム語・日本語プログラム）最終学年、日本語で履修。専門分野は組込みシステムと産業用 IoT で、マイクロコントローラ、リアルタイムシステム、コンピュータネットワークを中心に専攻・実践。機械学習の科目は、エッジAI（マイコン上でのモデル推論）の実践に応用。所属するほとんどのチームプロジェクトでリーダーを務めています。</p>
+      </div>
+    </section>
+
+    <!-- 3. 実務経験 -->
+    <section class="section">
+      <h2 class="section-heading">実務経験</h2>
+      <div class="section-divider"></div>
+
+      <!-- Entry 1 -->
+      <div class="entry">
+        <div class="meta-line">APES Lab | 現在</div>
+        <div class="entry-title">組み込みファームウェアエンジニア - EV 充電設備</div>
+        <p class="body-p">パートナー企業と共同開発した商用 EV 充電設備の開発に参加しています。ソースコードは NDA の対象のため、以下は実装コードではなく、自身が担当した設計・実装範囲の説明です。</p>
+        <ul class="entry-bullets">
+          <li>リングトポロジの EV 充電ネットワーク向け電力配分ファームウェア - STM32H723、CAN 2.0B 29ビット、SPI 変換の MCP2515 経由で 16 キャビネット、最大 32 口の充電ガンに対応。</li>
+          <li>自律分散型電力融通アルゴリズム - 待機中（アイドル）の充電ガンから電力を自律融通し、充電需要発生時にフェイルセーフに回収。</li>
+          <li>4層アーキテクチャ：アプリケーション -&gt; ミドルウェア（サービス / FSM / 制御）-&gt; ドライバ -&gt; HAL。上位層への呼び出し方向を厳格に制限。</li>
+          <li>MISRA C:2012 の静的解析パイプライン（カスタムアドオン付き cppcheck）およびモック HAL を用いた PC 上の単体テスト。</li>
+          <li>ノンブロッキング設計 - 制御パスにおける HAL_Delay() を完全に排除。すべてのタイミングは 1 ms のソフトウェアタイマー配列から取得。</li>
+          <li>2ポート出力 EV 急速充電器ファームウェア - OCPP、GB/T 27930 による車両側通信、DLT-645 による DC 電力量計量、WIZnet イーサネットコントローラ、RFID、絶縁監視、FATFS 併用 USB Host、bootloader / IAP。</li>
+        </ul>
+      </div>
+
+      <!-- Entry 2 -->
+      <div class="entry">
+        <div class="meta-line">Yootek | 夏季インターンシップ</div>
+        <div class="entry-title">IoT ファームウェアエンジニア</div>
+        <p class="body-p">SmartGarden - エンタープライズ向け IoT プラットフォーム。</p>
+        <ul class="entry-bullets">
+          <li>ESP-IDF 上の ESP32 ファームウェア。センサ状態を MQTT で配信。</li>
+          <li>NestJS バックエンド（PostgreSQL、Prisma）、リアルタイム更新に WebSocket。</li>
+          <li>JWT 認証とロールベースのアクセス制御。</li>
+        </ul>
+      </div>
+
+      <!-- Entry 3 -->
+      <div class="entry">
+        <div class="meta-line">大学開発プロジェクト | 2023 - 2027</div>
+        <div class="entry-title">組み込み・IoT エンジニア - リーダー</div>
+        <p class="body-p">1 年次から現在まで、所属するほとんどのチームプロジェクトをリードまたは共同リード。個人プロジェクトはハードウェア、ファームウェア、アプリまで一人で担当。各プロジェクトの技術的な詳細は下部のプロジェクト欄に記載しています。</p>
+      </div>
+    </section>
+
+    <!-- 4. 開発プロジェクト -->
+    <section class="section">
+      <h2 class="section-heading">開発プロジェクト</h2>
+      <div class="section-divider"></div>
+
+
+      <div class="entry">
+        <div class="entry-title mono">embedded-iot-toolkit <span class="project-badge">オープンソース - MIT - 単体テスト 89 項目</span></div>
+        <p class="body-p">依存関係ゼロの C99 ライブラリ。繰り返し実装しているファームウェアの基本部品を集約しました：ノンブロッキングタイマーバンク、チェックサムと同期回復を備えた ISR セーフなフレーミングシリアルプロトコル、ビットタイミング算出器つき CAN 2.0B 29ビット codec、そして古い値を返さず鮮度不足を報告するセンサデコーダ。</p>
+        <p class="body-p project-url mono"><a href="https://github.com/CatKod/embedded-iot-toolkit">github.com/CatKod/embedded-iot-toolkit</a></p>
+      </div>
+      <div class="entry">
+        <div class="entry-title mono">rokid-max-diy-station <span class="project-badge">オープンソース - MIT - 単体テスト 218 項目</span></div>
+        <p class="body-p">Rokid Max AR グラスを空間ディスプレイに変えました。仮想の Windows モニターが視野に貼り付くのではなく、部屋の中に実在する形态です。USB HID で読んだ IMU を Mahony フィルタで 3 自由度の姿勢に融合し、IddCx ドライバが負の座標に実在するモニターを生成してヒットテストとフォーカスを OS に任せ、Windows.Graphics.Capture と Direct3D 11 がそのデスクトップを姿勢に固定された 3D クアッドとして Micro-OLED に再投影します。</p>
+        <p class="body-p project-url mono"><a href="https://github.com/CatKod/rokid-max-diy-station">github.com/CatKod/rokid-max-diy-station</a></p>
+      </div>
+
+      <div class="entry">
+        <div class="entry-title mono">SmartHome <span class="project-badge">大学開発プロジェクト - 最高評価 10/10</span></div>
+        <p class="body-p">リアルタイム MCU が安全性の面でクラウドに依存しない 2 層アーキテクチャ。ESP32-S3 が Wi-Fi と MQTT を担当し、STM32H7 がハードウェアを掌握します。RFID と PIN 入力、シフトレジスタによる LED バス、環境センサ、窓の自動アクチュエータを備えています。</p>
+        <p class="body-p project-url mono"><a href="https://github.com/CatKod/SmartHome">github.com/CatKod/SmartHome</a></p>
+      </div>
+
+      <div class="entry">
+        <div class="entry-title mono">Smart Power Outlet <span class="project-badge">卒業研究 - 単独開発</span></div>
+        <p class="body-p">ボード一枚ではなく製品として完結した IoT デバイス：PCB は EasyEDA Pro で設計し、ファームウェアは Wi-Fi プロビジョニング付きの ESP-IDF で認証情報（SSID・パスワード）をハードコードせず、PlatformIO のビルドが ESP32 と ESP8266 の両方に対応し、クロスプラットフォームの Flutter アプリが操作します。</p>
+        <p class="body-p project-url mono"><a href="https://github.com/CatKod/Smart_Power_Outlet">github.com/CatKod/Smart_Power_Outlet</a></p>
+      </div>
+
+      <div class="entry">
+        <div class="entry-title mono">Sun-Car Damage Assessment <span class="project-badge">SUN 奨学金プロジェクト</span></div>
+        <p class="body-p">SUN 奨学金応募のために構築した物体検出・インスタンスセグメンテーション・重症度スコアリングのコンピュータビジョンパイプライン。ESP32-CAM がフレームを取得し、UART 経由で STM32 に結果をストリーミングするため、推論はクラウドではなくエッジで動作します。</p>
+        <p class="body-p project-url mono"><a href="https://github.com/CatKod/Sun-Car-Damage-AI-Assessment">github.com/CatKod/Sun-Car-Damage-AI-Assessment</a></p>
+      </div>
+    </section>
+
+    <!-- 5. 資格・修了証 -->
+    <section class="section">
+      <h2 class="section-heading">資格・修了証</h2>
+      <div class="section-divider"></div>
+
+      <div class="entry">
+        <div class="entry-title">日本語能力試験（JLPT）N3</div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-title">Machine Learning Specialization</div>
+        <div class="meta-line">DeepLearning.AI × Stanford University | 2025年4月 - 5月</div>
+        <ul class="entry-bullets">
+          <li>教師あり機械学習：回帰と分類</li>
+          <li>高度な学習アルゴリズム</li>
+          <li>教師なし学習、レコメンダーシステム、強化学習</li>
+          <li>実践機械学習プロジェクト</li>
+        </ul>
+      </div>
+
+      <div class="entry">
+        <div class="entry-title">Deep Learning Specialization</div>
+        <div class="meta-line">DeepLearning.AI | 2025年7月</div>
+        <ul class="entry-bullets">
+          <li>ニューラルネットワークと深層学習</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 6. スキル -->
+    <section class="section">
+      <h2 class="section-heading">スキル</h2>
+      <div class="section-divider"></div>
+      <div class="skills-grid">
+        <ul class="skills-col">
+          <li>C (C99, Embedded C)</li>
+          <li>C++</li>
+          <li>基本的な Assembly</li>
+          <li>STM32 Cortex-M series</li>
+          <li>STM32Cube HAL</li>
+          <li>Bare-metal register work</li>
+          <li>CAN 2.0B 29-bit</li>
+          <li>FDCAN</li>
+          <li>SPI-to-CAN bridge</li>
+          <li>MISRA C:2012</li>
+          <li>cppcheck</li>
+          <li>Hierarchical state machines</li>
+          <li>Non-blocking + soft timers</li>
+        </ul>
+        <ul class="skills-col">
+          <li>FreeRTOS</li>
+          <li>ESP-IDF</li>
+          <li>PlatformIO</li>
+          <li>Bootloader / IAP</li>
+          <li>USB Host</li>
+          <li>FATFS</li>
+          <li>OCPP</li>
+          <li>GB/T 27930</li>
+          <li>DLT-645</li>
+          <li>MQTT</li>
+        </ul>
+        <ul class="skills-col">
+          <li>UART / RS485 / Modbus</li>
+          <li>SPI Ethernet controller</li>
+          <li>Wi-Fi provisioning</li>
+          <li>TouchGFX</li>
+          <li>LVGL</li>
+          <li>EasyEDA Pro</li>
+          <li>OpenCV</li>
+          <li>Python / FastAPI</li>
+          <li>TypeScript / NestJS</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 7. 言語 -->
+    <section class="section">
+      <h2 class="section-heading">言語</h2>
+      <div class="section-divider"></div>
+      <div class="lang-list">
+        <div class="lang-row">
+          <div class="lang-label">日本語（JLPT N3）</div>
+        </div>
+        <div class="lang-note">技術データシート・仕様書の読解、および業務上の報連相に対応可能。</div>
+        <div class="lang-row">
+          <div class="lang-label">ベトナム語（母語）</div>
+        </div>
+        <div class="lang-row">
+          <div class="lang-label">英語（ビジネスレベル）</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom dark bar -->
+    <div class="bottom-bar"></div>
+  </div>
+
+  <a class="hidden-ref" href="https://github.com/CatKod/embedded-iot-toolkit" aria-hidden="true">https://github.com/CatKod/embedded-iot-toolkit</a>
+</body>
+</html>

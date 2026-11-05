@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hoàng Kim Vĩnh — Embedded Firmware Engineer</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 210mm;
+      height: 297mm;
+      margin: 0;
+      padding: 0;
+      background: #F0F0F0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      font-family: 'Noto Sans', 'Segoe UI', Arial, sans-serif;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    .cv-container {
+      width: 210mm;
+      height: 297mm;
+      max-height: 297mm;
+      overflow: hidden;
+      display: flex;
+      flex-direction: row;
+      background: #FFFFFF;
+      position: relative;
+    }
+
+    /* TYPOGRAPHY HELPERS */
+    .mono {
+      font-family: 'Cascadia Mono', Consolas, 'Courier New', monospace;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ==========================================================================
+       LEFT RAIL (GRAPHITE INSTRUMENT RAIL)
+       ========================================================================== */
+    .cv-left-rail {
+      width: 65mm;
+      min-width: 65mm;
+      max-width: 65mm;
+      height: 297mm;
+      background: #8C1418;
+      color: #FFFFFF;
+      padding: 5.2mm 5.5mm 6mm 6mm;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      border-right: 1px solid #6E0F12;
+      z-index: 10;
+      justify-content: space-between;
+    }
+
+    /* Signal Rail PCB Trace (Decorative Flourish) */
+    .pcb-trace {
+      position: absolute;
+      top: 57mm;
+      bottom: 20mm;
+      right: 3mm;
+      width: 2px;
+      background: #F7B9BD;
+      opacity: 0.55;
+      border-radius: 1px;
+    }
+
+    /* Identity block (name + role, moved from the canvas header band) */
+    .rail-identity {
+      margin-bottom: 3.4mm;
+    }
+    .rail-name {
+      font-size: 15pt;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      line-height: 1.05;
+      margin-bottom: 0.9mm;
+    }
+    .rail-role {
+      font-size: 7.8pt;
+      font-weight: 700;
+      color: #F7B9BD;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    /* Photo block */
+    .rail-photo-wrap {
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 4.2mm;
+    }
+    .rail-photo {
+      width: 38mm;
+      height: 38mm;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 2px;
+      display: block;
+    }
+
+    /* Rail Section Common */
+    .rail-section {
+      margin-bottom: 4.2mm;
+      position: relative;
+    }
+    .rail-section-header {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 1.6mm;
+    }
+    .rail-section-title {
+      font-size: 8.2pt;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #FFFFFF;
+    }
+    .rail-section-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      flex-shrink: 0;
+    }
+
+    /* Contact Block */
+    .contact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.7mm;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 7.4pt;
+      color: #FFFFFF;
+      line-height: 1.15;
+    }
+    .contact-icon {
+      width: 9.5px;
+      height: 9.5px;
+      stroke: #FFFFFF;
+      stroke-width: 1.7;
+      fill: none;
+      flex-shrink: 0;
+    }
+    .contact-link {
+      color: #FFFFFF;
+      word-break: break-all;
+    }
+    .contact-link:hover {
+      color: #F7B9BD;
+      text-decoration: underline;
+    }
+
+    /* Education Block */
+    .edu-degree {
+      font-size: 8pt;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.2;
+      margin-bottom: 0.5mm;
+    }
+    .edu-meta {
+      font-size: 7.2pt;
+      color: #E5BFC1;
+      line-height: 1.2;
+      margin-bottom: 1.0mm;
+      display: flex;
+      justify-content: space-between;
+    }
+    .edu-detail {
+      font-size: 7pt;
+      color: #E5BFC1;
+      line-height: 1.22;
+    }
+
+    /* Skills Block */
+    .skills-group {
+      margin-bottom: 2.4mm;
+    }
+    .skills-group:last-child {
+      margin-bottom: 0;
+    }
+    .skills-group-label {
+      font-size: 7.3pt;
+      font-weight: 700;
+      color: #F7B9BD;
+      margin-bottom: 0.25mm;
+      letter-spacing: -0.01em;
+    }
+    .skills-items {
+      font-size: 7pt;
+      color: #FFFFFF;
+      line-height: 1.22;
+    }
+    .skills-items .proto {
+      font-family: 'Cascadia Mono', Consolas, 'Courier New', monospace;
+      color: #E5BFC1;
+      font-size: 6.9pt;
+    }
+
+    /* Languages Block */
+    .lang-item {
+      margin-bottom: 1.7mm;
+    }
+    .lang-item:last-child {
+      margin-bottom: 0;
+    }
+    .lang-header {
+      display: flex;
+      font-size: 7.2pt;
+      color: #FFFFFF;
+      margin-bottom: 0.6mm;
+      line-height: 1;
+    }
+
+    /* ==========================================================================
+       RIGHT CANVAS (WHITE SCHEMATIC CANVAS)
+       ========================================================================== */
+    .cv-right-canvas {
+      width: 145mm;
+      min-width: 145mm;
+      max-width: 145mm;
+      height: 297mm;
+      background: #FFFFFF;
+      color: #33393F;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Main Content Body */
+    .canvas-body {
+      padding: 4.6mm 6.5mm 4.5mm 6.5mm;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    /* Section spacing (rebalanced) */
+    .canvas-section { margin-bottom: 0; }
+    .canvas-section:last-child { margin-bottom: 0; }
+
+    /* Canvas Section Headers */
+    .section-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 1.05mm;
+      margin-bottom: 0.7mm;
+    }
+    .section-icon {
+      width: 11px;
+      height: 11px;
+      stroke: #C1272D;
+      stroke-width: 1.7;
+      fill: none;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 8.4pt;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #8C1418;
+      text-transform: none;
+      white-space: nowrap;
+    }
+    .section-rule {
+      height: 1px;
+      background: #E8D3D4;
+      flex-grow: 1;
+    }
+
+    /* PROFILE */
+    .profile-text {
+      font-size: 7.4pt;
+      line-height: 1.18;
+      color: #33393F;
+      margin-bottom: 0.5mm;
+    }
+    .profile-text:last-child {
+      margin-bottom: 0;
+    }
+
+    /* EXPERIENCE TIMELINE */
+    .experience-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1mm;
+    }
+    .timeline-entry {
+      display: flex;
+      position: relative;
+    }
+    .timeline-gutter {
+      width: 20mm;
+      min-width: 20mm;
+      max-width: 20mm;
+      padding-right: 2.5mm;
+      text-align: right;
+      font-size: 6.8pt;
+      color: #6B7480;
+      line-height: 1.16;
+      padding-top: 0.5px;
+    }
+    .timeline-spine {
+      width: 1px;
+      background: #E8D3D4;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .timeline-node {
+      position: absolute;
+      top: 3px;
+      left: -2px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #C1272D;
+    }
+    .timeline-content {
+      padding-left: 2.8mm;
+      flex-grow: 1;
+    }
+    .exp-header {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 0.15mm;
+    }
+    .exp-org {
+      font-size: 7.9pt;
+      font-weight: 700;
+      color: #14191F;
+    }
+    .exp-divider {
+      color: #6B7480;
+      font-size: 7pt;
+    }
+    .exp-role {
+      font-size: 7.4pt;
+      font-weight: 600;
+      color: #B32028;
+    }
+    .exp-intro {
+      font-size: 7.2pt;
+      color: #33393F;
+      line-height: 1.15;
+      margin-bottom: 0.3mm;
+    }
+    .exp-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3mm;
+    }
+    .exp-bullet-item {
+      position: relative;
+      padding-left: 2.3mm;
+      font-size: 7.1pt;
+      line-height: 1.16;
+      color: #33393F;
+    }
+    .exp-bullet-item::before {
+      content: '';
+      position: absolute;
+      left: 0.2mm;
+      top: 3.6px;
+      width: 2px;
+      height: 2px;
+      background: #6B7480;
+      border-radius: 50%;
+    }
+
+    /* PROJECTS */
+    .projects-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55mm;
+    }
+    .project-entry {
+      border-bottom: 1px solid #EEDCDC;
+      padding-bottom: 0.45mm;
+    }
+    .project-entry:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .project-header {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 0.25mm;
+    }
+    .project-title {
+      font-size: 7.7pt;
+      font-weight: 700;
+      color: #14191F;
+    }
+    .project-badge {
+      font-size: 6.3pt;
+      font-weight: 600;
+      color: #B32028;
+      background: #FBE9EA;
+      padding: 0.5px 3.2px;
+      border-radius: 2px;
+      line-height: 1.2;
+    }
+    .project-desc {
+      font-size: 7.05pt;
+      line-height: 1.16;
+      color: #33393F;
+      margin-bottom: 0.25mm;
+    }
+    .project-url {
+      font-size: 6.6pt;
+      color: #6B7480;
+      display: inline-block;
+      line-height: 1.1;
+    }
+    .project-url:hover {
+      color: #C1272D;
+      text-decoration: underline;
+    }
+
+    /* CERTIFICATIONS */
+    .certs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8mm;
+    }
+    .cert-item-full {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      margin-bottom: 0.2mm;
+    }
+    .cert-title {
+      font-size: 7.5pt;
+      font-weight: 700;
+      color: #14191F;
+    }
+    .cert-issuer {
+      font-size: 6.7pt;
+      color: #6B7480;
+    }
+    .cert-card {
+      background: #FDF8F8;
+      border: 1px solid #EEDCDC;
+      border-radius: 2px;
+      padding: 0.9mm 1.5mm;
+    }
+    .cert-card-title {
+      font-size: 7.2pt;
+      font-weight: 700;
+      color: #14191F;
+      line-height: 1.13;
+    }
+    .cert-card-meta {
+      font-size: 6.5pt;
+      color: #6B7480;
+      margin-bottom: 0.4mm;
+    }
+    .cert-sublist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2mm;
+    }
+    .cert-subitem {
+      font-size: 6.6pt;
+      color: #33393F;
+      position: relative;
+      padding-left: 2mm;
+      line-height: 1.13;
+    }
+    .cert-subitem::before {
+      content: '–';
+      position: absolute;
+      left: 0;
+      color: #C1272D;
+    }
+  </style>
+</head>
+<body>
+  <div class="cv-container">
+    
+    <!-- ====================================================================
+         LEFT RAIL (GRAPHITE INSTRUMENT RAIL)
+         ==================================================================== -->
+    <aside class="cv-left-rail">
+      <div class="pcb-trace" aria-hidden="true"></div>
+
+      <!-- Identity: name + role -->
+      <div class="rail-identity">
+        <h1 class="rail-name">Hoàng Kim Vĩnh</h1>
+        <div class="rail-role">Embedded Firmware Engineer</div>
+      </div>
+
+      <!-- Photo: avatar.jpg (alternative: photo.jpg) -->
+      <div class="rail-photo-wrap">
+        <img src="avatar.jpg" alt="Hoàng Kim Vĩnh" class="rail-photo">
+      </div>
+
+      <!-- Contact Block -->
+      <section class="rail-section">
+        <div class="rail-section-header">
+          <div class="rail-section-dot"></div>
+          <h2 class="rail-section-title">Contact</h2>
+        </div>
+        <div class="contact-list">
+          <div class="contact-item">
+            <svg class="contact-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            <a href="mailto:kimvinhh6@gmail.com" class="contact-link mono">kimvinhh6@gmail.com</a>
+          </div>
+          <div class="contact-item">
+            <svg class="contact-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            <a href="https://catkod.github.io/" class="contact-link mono">catkod.github.io</a>
+          </div>
+          <div class="contact-item">
+            <svg class="contact-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>Hanoi, Vietnam</span>
+          </div>
+          <div class="contact-item">
+            <svg class="contact-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            <a href="https://www.linkedin.com/in/kim-v%C3%A9nh-ho%C3%A0ng-9a306935a/" class="contact-link">LinkedIn</a>
+          </div>
+          <div class="contact-item">
+            <svg class="contact-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+            <a href="https://github.com/CatKod" class="contact-link mono">github.com/CatKod</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Education Block -->
+      <section class="rail-section">
+        <div class="rail-section-header">
+          <div class="rail-section-dot"></div>
+          <h2 class="rail-section-title">Education</h2>
+        </div>
+        <div class="edu-degree">Information Technology (Vietnamese-Japanese)</div>
+        <div class="edu-meta">
+          <span>Hanoi University of Science and Technology</span>
+          <span class="mono">2023 - 2027</span>
+        </div>
+        <p class="edu-detail">Final-year Information Technology (Vietnamese-Japanese) student, taught in Japanese. My focus is embedded systems and IoT, built around microcontrollers, real-time systems and computer networks; the machine learning coursework feeds the models I run on-device. I lead most of the team projects I take part in.</p>
+      </section>
+
+      <!-- Skills Block -->
+      <section class="rail-section">
+        <div class="rail-section-header">
+          <div class="rail-section-dot"></div>
+          <h2 class="rail-section-title">Skills</h2>
+        </div>
+        
+        <div class="skills-group">
+          <div class="skills-group-label">Embedded GUI</div>
+          <div class="skills-items">TouchGFX on STM32, LVGL on ESP32, GUI design tooling, <span class="proto">MIPI-DSI display interface</span>, I/O expander for touch and buttons, Layout and screen-state design</div>
+        </div>
+
+        <div class="skills-group">
+          <div class="skills-group-label">Programming Languages</div>
+          <div class="skills-items">C (C99, Embedded C), C++, Python, basic Assembly</div>
+        </div>
+
+        <div class="skills-group">
+          <div class="skills-group-label">Firmware &amp; RTOS</div>
+          <div class="skills-items">STM32 Cortex-M series, STM32Cube HAL, Bare-metal register work, Hierarchical state machines, Non-blocking + soft timers, FreeRTOS, ESP-IDF, PlatformIO, Bootloader / IAP, USB Host, FATFS</div>
+        </div>
+
+        <div class="skills-group">
+          <div class="skills-group-label">Protocols</div>
+          <div class="skills-items"><span class="proto">CAN 2.0B 29-bit</span>, <span class="proto">FDCAN</span>, <span class="proto">SPI-to-CAN bridge</span>, <span class="proto">OCPP</span>, <span class="proto">GB/T 27930</span>, <span class="proto">DLT-645</span>, <span class="proto">MQTT - topic design, QoS, retain, LWT</span>, <span class="proto">UART / RS485 / Modbus</span>, SPI Ethernet controller, Wi-Fi provisioning, Framed ASCII protocol with checksum + resync</div>
+        </div>
+
+        <div class="skills-group">
+          <div class="skills-group-label">Hardware &amp; power</div>
+          <div class="skills-items">EasyEDA Pro, Contactor, power module, current/voltage ramping, Insulation monitoring (IMD), Safe sequential switching, Logic analyser, Fault injection, Shift register for LED bus, RTD temperature sensing</div>
+        </div>
+
+        <div class="skills-group">
+          <div class="skills-group-label">Edge AI &amp; App</div>
+          <div class="skills-items">Computer vision, PyTorch, On-device inference, OpenCV, Python, FastAPI, TypeScript, NestJS, PostgreSQL, Flutter, React</div>
+        </div>
+      </section>
+
+      <!-- Languages Block -->
+      <section class="rail-section">
+        <div class="rail-section-header">
+          <div class="rail-section-dot"></div>
+          <h2 class="rail-section-title">Languages</h2>
+        </div>
+        <div class="lang-item">
+          <div class="lang-header">
+            <span>Japanese (JLPT N3)</span>
+          </div>
+        </div>
+        <div class="lang-item">
+          <div class="lang-header">
+            <span>Vietnamese (Native)</span>
+          </div>
+        </div>
+        <div class="lang-item">
+          <div class="lang-header">
+            <span>English (Working proficiency)</span>
+          </div>
+        </div>
+      </section>
+
+    </aside>
+
+
+
+
+
+    <!-- ====================================================================
+         RIGHT CANVAS (WHITE SCHEMATIC CANVAS)
+         ==================================================================== -->
+    <main class="cv-right-canvas">
+
+      <!-- Main Canvas Body -->
+      <div class="canvas-body">
+        
+        <!-- PROFILE -->
+        <section class="canvas-section">
+          <div class="section-title-wrap">
+            <svg class="section-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <h2 class="section-title">Profile</h2>
+            <div class="section-rule"></div>
+          </div>
+          <p class="profile-text">I am a final-year Information Technology (Vietnamese-Japanese) student at Hanoi University of Science and Technology, with a focus on embedded systems and IoT. Most of my firmware work happens at APES Lab, where I contribute to a commercial EV charging station developed with a partner manufacturer. The code is under NDA, but the technical scope is what I do every day.</p>
+          <p class="profile-text">My AI background is formal rather than self-taught (DeepLearning.AI × Stanford), and it is what lets me run models on-device: a computer vision pipeline for vehicle damage assessment, and a Vietnamese voice-command classifier that runs entirely on an ESP32-P4 with no cloud dependency.</p>
+        </section>
+
+        <!-- EXPERIENCE -->
+        <section class="canvas-section">
+          <div class="section-title-wrap">
+            <svg class="section-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            <h2 class="section-title">Experience</h2>
+            <div class="section-rule"></div>
+          </div>
+
+          <div class="experience-list">
+            <!-- Entry 1 -->
+            <article class="timeline-entry">
+              <div class="timeline-gutter mono">Present</div>
+              <div class="timeline-spine"><div class="timeline-node"></div></div>
+              <div class="timeline-content">
+                <div class="exp-header">
+                  <span class="exp-org">APES Lab</span>
+                  <span class="exp-divider">/</span>
+                  <span class="exp-role">Embedded Firmware Engineer - EV Charging Station</span>
+                </div>
+                <p class="exp-intro">Contribute to a commercial EV charging station developed with a partner manufacturer. The code is under NDA, so the scope below describes my responsibilities rather than the implementation.</p>
+                <ul class="exp-bullets">
+                  <li class="exp-bullet-item">Power-sharing firmware for a ring-topology EV charging network - STM32H723, CAN 2.0B 29-bit over SPI-to-CAN MCP2515, up to 32 charging guns across 16 cabinets.</li>
+                  <li class="exp-bullet-item">Distributed power borrowing and reclaim algorithms - the firmware autonomously borrows capacity from idle guns and reclaims it later.</li>
+                  <li class="exp-bullet-item">Four-layer architecture: Application -&gt; Middleware (Service / FSM / Control) -&gt; Driver -&gt; HAL, with strictly enforced upward-only calls.</li>
+                  <li class="exp-bullet-item">MISRA C:2012 static analysis pipeline (cppcheck with a custom addon) and PC-based unit tests with a mocked HAL.</li>
+                  <li class="exp-bullet-item">Non-blocking firmware design - no HAL_Delay() anywhere; all timing comes from a 1 ms software timer array.</li>
+                  <li class="exp-bullet-item">Two-gun EV charger firmware - OCPP, GB/T 27930 vehicle-side comms, DLT-645 DC metering, WIZnet Ethernet controllers, RFID, insulation monitoring, USB Host with FATFS, bootloader / IAP.</li>
+                </ul>
+              </div>
+            </article>
+
+            <!-- Entry 2 -->
+            <article class="timeline-entry">
+              <div class="timeline-gutter mono">Summer Internship</div>
+              <div class="timeline-spine"><div class="timeline-node"></div></div>
+              <div class="timeline-content">
+                <div class="exp-header">
+                  <span class="exp-org">Yootek</span>
+                  <span class="exp-divider">/</span>
+                  <span class="exp-role">IoT Firmware Engineer</span>
+                </div>
+                <p class="exp-intro">SmartGarden - an enterprise IoT platform.</p>
+                <ul class="exp-bullets">
+                  <li class="exp-bullet-item">ESP32 firmware on ESP-IDF, publishing sensor state over MQTT.</li>
+                  <li class="exp-bullet-item">NestJS backend with PostgreSQL and Prisma, WebSocket for live updates.</li>
+                  <li class="exp-bullet-item">JWT authentication and role-based access control.</li>
+                </ul>
+              </div>
+            </article>
+
+            <!-- Entry 3 -->
+            <article class="timeline-entry">
+              <div class="timeline-gutter mono">2023 - 2027</div>
+              <div class="timeline-spine"><div class="timeline-node"></div></div>
+              <div class="timeline-content">
+                <div class="exp-header">
+                  <span class="exp-org">Academic Projects</span>
+                  <span class="exp-divider">/</span>
+                  <span class="exp-role">Embedded &amp; IoT Engineer - Team Lead</span>
+                </div>
+                <p class="exp-intro">Led or co-led most team projects from first year to the present; personal projects were delivered solo, end to end across hardware, firmware and app. Technical detail for each project is in the Projects section below.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- PROJECTS -->
+        <section class="canvas-section">
+          <div class="section-title-wrap">
+            <svg class="section-icon" aria-hidden="true" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            <h2 class="section-title">Projects</h2>
+            <div class="section-rule"></div>
+          </div>
+
+          <div class="projects-list">
+            <!-- Project 1 -->
+            <article class="project-entry">
+              <div class="project-header">
+                <span class="project-title mono">embedded-iot-toolkit</span>
+                <span class="project-badge">Open source - MIT - 89 tests</span>
+              </div>
+              <p class="project-desc">A dependency-free C99 library of the firmware building blocks I keep rewriting: a non-blocking timer bank, an ISR-safe framed serial protocol with checksums and resynchronisation, a CAN 2.0B 29-bit codec with a bit-timing solver, and sensor decoders that report staleness instead of returning a stale value.</p>
+              <a href="https://github.com/CatKod/embedded-iot-toolkit" class="project-url mono">github.com/CatKod/embedded-iot-toolkit</a>
+            </article>
+            <!-- Project 2 -->
+            <article class="project-entry">
+              <div class="project-header">
+                <span class="project-title mono">rokid-max-diy-station</span>
+                <span class="project-badge">Open source - MIT - 218 tests</span>
+              </div>
+              <p class="project-desc">Rokid Max AR glasses turned into a spatial display: a virtual Windows monitor anchored in the room, not to your eyes. A Mahony filter fuses the USB HID IMU into a 3-DoF head pose, an IddCx driver creates a real monitor so the OS owns the input, and D3D11 anchors that desktop in 3D.</p>
+              <a href="https://github.com/CatKod/rokid-max-diy-station" class="project-url mono">github.com/CatKod/rokid-max-diy-station</a>
+            </article>
+
+            <!-- Project 3 -->
+            <article class="project-entry">
+              <div class="project-header">
+                <span class="project-title mono">SmartHome</span>
+                <span class="project-badge">University capstone - 10/10</span>
+              </div>
+              <p class="project-desc">A two-tier architecture where the real-time MCU never depends on the cloud for safety. The ESP32-S3 handles Wi-Fi and MQTT; the STM32H7 owns the hardware. RFID and PIN entry, a shift-register LED bus, environmental sensors and an automatic window actuator.</p>
+              <a href="https://github.com/CatKod/SmartHome" class="project-url mono">github.com/CatKod/SmartHome</a>
+            </article>
+
+            <!-- Project 4 -->
+            <article class="project-entry">
+              <div class="project-header">
+                <span class="project-title mono">Smart Power Outlet</span>
+                <span class="project-badge">Graduation capstone - solo</span>
+              </div>
+              <p class="project-desc">A complete IoT product rather than a board: the PCB was designed in EasyEDA Pro, the firmware is ESP-IDF with Wi-Fi provisioning so no credential is ever hardcoded, a PlatformIO build covers both ESP32 and ESP8266, and a cross-platform Flutter app drives it.</p>
+              <a href="https://github.com/CatKod/Smart_Power_Outlet" class="project-url mono">github.com/CatKod/Smart_Power_Outlet</a>
+            </article>
+
+            <!-- Project 5 -->
+            <article class="project-entry">
+              <div class="project-header">
+                <span class="project-title mono">Sun-Car Damage Assessment</span>
+                <span class="project-badge">SUN scholarship project</span>
+              </div>
+              <p class="project-desc">A computer vision pipeline for object detection, instance segmentation and severity scoring, built to apply for a SUN scholarship. An ESP32-CAM captures frames and streams the result to an STM32 over UART, so inference sits on the edge rather than in the cloud.</p>
+              <a href="https://github.com/CatKod/Sun-Car-Damage-AI-Assessment" class="project-url mono">github.com/CatKod/Sun-Car-Damage-AI-Assessment</a>
+            </article>
+          </div>
+        </section>
+
+        <!-- CERTIFICATIONS -->
+        <section class="canvas-section">
+          <div class="section-title-wrap">
+            <svg class="section-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+            <h2 class="section-title">Certifications</h2>
+            <div class="section-rule"></div>
+          </div>
+
+          <div class="certs-grid">
+            <div class="cert-item-full">
+              <span class="cert-title">Japanese Language Proficiency Test - N3</span>
+            </div>
+
+            <div class="cert-card">
+              <div class="cert-card-title">Machine Learning Specialization</div>
+              <div class="cert-card-meta mono">DeepLearning.AI x Stanford University · Apr - May 2025</div>
+              <ul class="cert-sublist">
+                <li class="cert-subitem">Supervised ML: Regression &amp; Classification</li>
+                <li class="cert-subitem">Advanced Learning Algorithms</li>
+                <li class="cert-subitem">Unsupervised Learning, Recommender Systems &amp; RL</li>
+                <li class="cert-subitem">ML Capstone</li>
+              </ul>
+            </div>
+
+            <div class="cert-card">
+              <div class="cert-card-title">Deep Learning Specialization</div>
+              <div class="cert-card-meta mono">DeepLearning.AI · Jul 2025</div>
+              <ul class="cert-sublist">
+                <li class="cert-subitem">Neural Networks and Deep Learning</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -32,7 +32,12 @@ export const profile = {
     website: 'https://catkod.github.io/CatKod/',
   },
 
-  cvPath: '/pdf/CV_Hoang-Kim-Vinh_2026.pdf',
+  /**
+   * Đường dẫn CV mặc định (bản tiếng Anh kiểu classic).
+   * Modal CV dùng HTML và tự chọn theo ngôn ngữ đang chọn trên site, nên
+   * giá trị này chỉ còn là đường dẫn tải về mặc định.
+   */
+  cvPath: '/cv/classic-en.pdf',
   favicon: '/catkod.svg',
 };
 
