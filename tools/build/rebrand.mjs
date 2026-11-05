@@ -19,6 +19,8 @@ import { elementsByClass, esc } from '../lib/dom.mjs';
 import { logoLoop, skillCard, toolGroup, flowGrid, indexButton, buildFocus } from '../lib/build.mjs';
 import { skillCardFlight, toolGroupFlight, proofGridChildren } from '../lib/skillsFlight.mjs';
 import { buildPanel } from '../lib/calendarDom.mjs';
+import { guestbookFeedHeadHtml, guestbookListHtml } from '../lib/guestbookDom.mjs';
+import { guestbookMessages, guestbookReplyCount, guestbookTotal } from '../data/guestbook.mjs';
 import { COMMON } from '../lib/common.mjs';
 import { SOCIALS, SOCIALS_JS } from '../lib/socials.mjs';
 import {
@@ -90,6 +92,18 @@ function replaceFlightArray(parts, key, value) {
     if (!span) return p;
     const arr = JSON.stringify(value);
     return { ...p, text: p.text.slice(0, span.start) + arr + p.text.slice(span.end) };
+  });
+}
+
+/**
+ * Thay một số trong flight (ví dụ `"initialTotal":59` -> `"initialTotal":16`).
+ * Chỉ thay trong flight — DOM tĩnh đã được dựng riêng.
+ */
+function replaceFlightNumber(parts, key, value) {
+  const re = new RegExp(`("${key}":)\\d+`, 'g');
+  return parts.map((p) => {
+    if (p.kind === 'raw') return p;
+    return { ...p, text: p.text.replace(re, `$1${value}`) };
   });
 }
 
@@ -903,6 +917,33 @@ function doCredentials(parts) {
 
 function doGuestbook(parts) {
   parts = replaceAll(parts, COMMON);
+
+  // Bản gốc để lại 10 lời ghi bằng tiếng Indonesia của tác giả template.
+  // Thay bằng bộ lời ghi tiếng Anh của Hoàng Kim Vĩnh (tools/data/guestbook.mjs).
+  //
+  // Phải sửa CẢ hai bên, nếu không React sẽ báo hydration mismatch:
+  //   - DOM: khối `.guestbook-list` và đầu bảng `.guestbook-feed-head`
+  //   - Flight: mảng `initialMessages` + hai số `initialTotal` /
+  //     `initialReplyCount` (client dùng chúng để vẽ đầu bảng).
+  parts = replaceByClass(parts, 'guestbook-feed-head', () => guestbookFeedHeadHtml());
+  parts = replaceByClass(parts, 'guestbook-list', () => guestbookListHtml());
+
+  parts = replaceFlightArray(
+    parts,
+    'initialMessages',
+    guestbookMessages.map((m) => ({
+      id: m.id,
+      name: m.name,
+      message: m.message,
+      reply: m.reply,
+      status: m.status,
+      createdAt: m.createdAt,
+      repliedAt: m.repliedAt,
+    })),
+  );
+  parts = replaceFlightNumber(parts, 'initialReplyCount', guestbookReplyCount);
+  parts = replaceFlightNumber(parts, 'initialTotal', guestbookTotal);
+
   return parts;
 }
 

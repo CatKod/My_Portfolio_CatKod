@@ -15,6 +15,9 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 
+/** Ngủ ngắn mà không cần timer (build tool chạy đồng bộ). */
+const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+
 /** Mốc thời gian cố định: 2026-01-01 00:00:00. */
 const FIXED_STAMP = '20260101000000';
 
@@ -71,7 +74,55 @@ export function normalizePdfDates(buf) {
 
 /** Đọc file PDF và ghi lại bản đã chuẩn hoá metadata. */
 export function normalizePdfFile(file) {
-  const buf = normalizePdfDates(readFileSync(file));
-  writeFileSync(file, buf);
+  const buf = normalizePdfDates(readPdfFile(file));
+  writePdfFile(file, buf);
   return buf.length;
+}
+
+/**
+ * Ghi file PDF (buffer đã chuẩn hoá).
+ *
+ * `writeFileSync` cũng có thể gặp `UNKNOWN` nếu Chrome còn giữ handle — cùng
+ * lý do như `readPdfFile`.
+ */
+function writePdfFile(file, buf) {
+  const DEADLINE_MS = 15000;
+  const started = Date.now();
+  let last;
+  while (Date.now() - started < DEADLINE_MS) {
+    try {
+      writeFileSync(file, buf);
+      return;
+    } catch (e) {
+      last = e;
+      sleep(200);
+    }
+  }
+  throw last;
+}
+
+/**
+ * Đọc file PDF đang được Chrome vừa ghi xong.
+ *
+ * Chrome headless (`--print-to-pdf`) trả về khi tiến trình kết thúc, nhưng
+ * trên Windows handle ghi file đôi khi chưa được giải phóng hẳn — `readFileSync`
+ * lúc đó ném `UNKNOWN: unknown error`. File PDF tiếng Nhật là file lớn nhất
+ * (≈800KB) nên Chrome còn giữ handle lâu nhất, và đây là lỗi xảy ra không
+ * đều — có lần build thành công, có lần không.
+ *
+ * Vì vậy phải chờ đủ lâu (tới 15 giây) thay vì thử vài lần rồi bỏ cuộc.
+ */
+export function readPdfFile(file) {
+  const DEADLINE_MS = 15000;
+  const started = Date.now();
+  let last;
+  while (Date.now() - started < DEADLINE_MS) {
+    try {
+      return readFileSync(file);
+    } catch (e) {
+      last = e;
+      sleep(200);
+    }
+  }
+  throw last;
 }
