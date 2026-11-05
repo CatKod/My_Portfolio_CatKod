@@ -1,0 +1,13 @@
+{
+  "name": "catkod-guestbook-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "node ../tools/guestbook/seed.mjs",
+    "set-admin-key": "node ../tools/guestbook/setAdminKey.mjs"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.8.2"
+  }
+}

@@ -51,3 +51,7 @@ tmp_repos.json
 
 .tmp-before/
 .tmp-after/
+
+# Dependency của API bảng tin khách (Vercel tự cài khi build)
+guestbook-api/node_modules/
+guestbook-api/.vercel/
