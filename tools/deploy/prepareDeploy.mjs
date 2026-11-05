@@ -57,6 +57,18 @@ for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
 // Tắt Jekyll để giữ nguyên `_next/` và cấu trúc file thô.
 writeFileSafe(path.join(dest, '.nojekyll'), '');
 
+// File CV là tài sản có sẵn (copy từ repo CatKod.github.io), không phải file
+// sinh bởi pipeline. Nếu git tự động đổi LF <-> CRLF (core.autocrlf=true)
+// thì byte trong `cv/` sẽ khác giữa các máy => bản deploy không còn tất định.
+// Vì vậy tắt hoàn toàn việc chuyển dòng cho các file này.
+writeFileSafe(
+  path.join(dest, '.gitattributes'),
+  'cv/*.html -text\n' +
+    'cv/*.js -text\n' +
+    'cv/*.jpg binary\n' +
+    'cv/*.pdf binary\n',
+);
+
 console.log('copied ' + copied + ' entries, ' + routes + ' routes converted to directories');
 if (skipped.length) console.log('skipped unused: ' + skipped.join(', '));
 console.log('-> ' + dest);
