@@ -1,9 +1,26 @@
+# ---------------------------------------------------------------------------
 # Artifact tạm trong quá trình rebrand / phân tích
+#
+# Tất cả artifact sinh ra khi dựng/đối chiếu site được gom vào `artifacts/`
+# để thư mục gốc repo luôn gọn. Thư mục này KHÔNG commit — chỉ dùng để tra
+# cứu trên máy.
+#
+#   artifacts/flight/     — flight payload gốc (*.flight.raw / *.flight.txt)
+#   artifacts/rsc/        — cây RSC đã giải nén (rsc_*.txt)
+#   artifacts/text/       — text node trích ra (text_*.txt)
+#   artifacts/templates/  — mẫu HTML dùng để vá (tmpl_*.html)
+#   artifacts/tmp/        — kết quả so sánh DOM, output tạm (tmp_*)
+# ---------------------------------------------------------------------------
+artifacts/
+
+# Artifact rơi về gốc repo (script cũ ghi thẳng vào cwd)
 *.flight.raw
 *.flight.txt
 rsc_*.txt
 text_*.txt
 tmp_*.html
+tmp_*.txt
+tmp_*.json
 tmpl_*.html
 gh_catkod.html
 
@@ -33,18 +50,12 @@ tools/*.json
 # Danh sách icon CDN — sinh ra bởi tools/verify/fetchCdnIcons.mjs
 tools/data/cdn-icons.txt
 
-# Kết quả so sánh DOM (script parity/diff)
-tmp_*_tree.txt
-
 # Dependency của script kiểm thử (playwright)
 node_modules/
 
 # Bản deploy dựng cho GitHub Pages — sinh ra từ site/ bởi tools/deploy/prepareDeploy.mjs,
 # đã được publish sang repo CatKod/CatKod.github.io nên không cần track ở đây.
 deploy/
-
-# Output tạm của script dò GitHub repo
-tmp_repos.json
 
 # File so sánh byte-for-byte trước/sau refactor
 .refactor-before.sha256

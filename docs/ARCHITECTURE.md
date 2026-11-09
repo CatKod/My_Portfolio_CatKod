@@ -147,6 +147,22 @@ Repo đích: biến môi trường `CATKOD_PAGES_REPO`, mặc định
 Chạy `node tools/bootstrap.mjs` để tải lại 52 file gốc từ upstream theo
 `tools/config/origin-manifest.json`.
 
+### 5.0 Thư mục `artifacts/`
+
+Mọi file trung gian sinh ra khi dựng/đối chiếu site được gom vào
+`artifacts/` (gitignored) thay vì nằm lộn xộn ở gốc repo:
+
+| Thư mục              | Nội dung                                       |
+|----------------------|------------------------------------------------|
+| `artifacts/flight/`  | Flight payload gốc (`*.flight.raw`, `*.flight.txt`) |
+| `artifacts/rsc/`     | Cây RSC đã giải nén (`rsc_*.txt`)             |
+| `artifacts/text/`    | Text node trích ra (`text_*.txt`)              |
+| `artifacts/templates/`| Mẫu HTML dùng để vá (`tmpl_*.html`)           |
+| `artifacts/tmp/`     | Kết quả so sánh DOM, output tạm (`tmp_*`)     |
+
+Script sinh artifact mới phải ghi vào đây (xem `tools/verify/diffRoute.mjs`)
+để thư mục gốc repo luôn gọn.
+
 ### 5.1 Tính tất định (determinism)
 
 Build phải cho ra **cùng một output byte-for-byte** mỗi lần chạy, nếu không

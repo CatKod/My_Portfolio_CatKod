@@ -4,7 +4,12 @@
  * Dùng để tìm chính xác chỗ React báo hydration mismatch.
  */
 import { chromium } from 'playwright';
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+// Kết quả diff ghi vào artifacts/tmp/ để không làm bẩn thư mục gốc repo.
+const OUT_DIR = 'artifacts/tmp';
+mkdirSync(OUT_DIR, { recursive: true });
 
 const route = process.argv[2] || '/work';
 const base = 'http://localhost:9310';
@@ -54,8 +59,8 @@ await page.goto(base + route, { waitUntil: 'domcontentloaded' });
 await page.waitForTimeout(2500);
 const client = await page.evaluate(NORMALIZE);
 
-writeFileSync('tmp_ssr_tree.txt', ssr);
-writeFileSync('tmp_client_tree.txt', client);
+writeFileSync(join(OUT_DIR, 'tmp_ssr_tree.txt'), ssr);
+writeFileSync(join(OUT_DIR, 'tmp_client_tree.txt'), client);
 
 // So từng "element" (theo dấu '<' bắt đầu) để tìm khối khác nhau
 const split = (s) => s.split(/(?=<)/).filter(Boolean);
