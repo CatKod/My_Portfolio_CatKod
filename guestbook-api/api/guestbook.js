@@ -14,6 +14,14 @@
  * `statusKey` là mã kết quả để client hiện thông báo đúng:
  *   sent | invalid | replied | reply-invalid
  *   | admin-required | message-deleted | reply-deleted
+ *
+ * LƯU Ý QUAN TRỌNG VỀ RUNTIME:
+ *   Vercel Node.js runtime (@vercel/node) gọi handler theo chuẩn Node:
+ *   `handler(req, res)` với `req` là IncomingMessage và `res` là
+ *   ServerResponse. Chuẩn Web (`Request`/`Response`) chỉ dùng được ở Edge
+ *   runtime. Nếu viết theo chuẩn Web trong runtime Node thì Vercel không nhận
+ *   được giá trị trả về và báo `FUNCTION_INVOCATION_FAILED` — nên toàn bộ
+ *   handler dưới đây dùng `req`/`res` của Node.
  */
 import { get, put } from '@vercel/blob';
 
@@ -66,8 +74,8 @@ const ALLOWED_ORIGINS = [
  * header CORS của origin đầu tiên cho mọi người khác, khiến request từ
  * origin lạ bị chặn oan.
  */
-function withCors(request) {
-  const origin = request.headers.get('origin');
+function withCors(req) {
+  const origin = req.headers?.origin;
   const allowed = origin && ALLOWED_ORIGINS.includes(origin) ? origin : null;
 
   const headers = {
@@ -81,6 +89,13 @@ function withCors(request) {
     headers['Access-Control-Max-Age'] = '86400';
   }
   return headers;
+}
+
+/** Ghi header CORS lên response của Node. */
+function applyCors(req, res) {
+  for (const [key, value] of Object.entries(withCors(req))) {
+    res.setHeader(key, value);
+  }
 }
 
 /**
@@ -154,8 +169,8 @@ function countReplies(messages) {
  * Admin mode là để Hoàng Kim Vĩnh tự trả lời / xoá lời ghi. Khoá nằm trong
  * Blob (private), client gửi kèm qua header `x-admin-key`.
  */
-async function isAdmin(request) {
-  const provided = request.headers.get('x-admin-key');
+async function isAdmin(req) {
+  const provided = req.headers?.['x-admin-key'];
   if (!provided) return false;
 
   const blob = await get(ADMIN_KEY_PATH, { access: 'private' }).catch(() => null);
@@ -221,51 +236,72 @@ function respond(statusKey, messages) {
   };
 }
 
-export default async function handler(request) {
-  const cors = withCors(request);
+/** Đọc body JSON của request (Node runtime không có `req.json()`). */
+function readJsonBody(req) {
+  return new Promise((resolve) => {
+    const chunks = [];
+    req.on('data', (chunk) => chunks.push(chunk));
+    req.on('end', () => {
+      const raw = Buffer.concat(chunks).toString('utf8');
+      if (!raw) return resolve({});
+      try {
+        resolve(JSON.parse(raw));
+      } catch {
+        resolve({});
+      }
+    });
+    req.on('error', () => resolve({}));
+  });
+}
+
+/** Lấy query string từ URL của request. */
+function queryOf(req) {
+  const url = new URL(req.url ?? '/', 'https://placeholder.invalid');
+  return url.searchParams;
+}
+
+export default async function handler(req, res) {
+  applyCors(req, res);
 
   // Preflight: trình duyệt gửi OPTIONS trước khi POST có body.
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: cors });
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return;
   }
 
   try {
-    if (request.method === 'GET') {
-      const url = new URL(request.url);
+    if (req.method === 'GET') {
+      const params = queryOf(req);
       const limit = Math.min(
         PAGE_LIMIT,
-        Math.max(1, Number(url.searchParams.get('limit')) || 10),
+        Math.max(1, Number(params.get('limit')) || 10),
       );
-      const offset = Math.max(0, Number(url.searchParams.get('offset')) || 0);
+      const offset = Math.max(0, Number(params.get('offset')) || 0);
 
       const store = await readStore();
       // Chưa seed: trả rỗng. Bản static của site vẫn có 16 lời ghi nên người
       // xem vẫn thấy nội dung cho tới khi seed xong.
       if (!store) {
-        return Response.json(
-          { messages: [], total: 0, replyCount: 0 },
-          { headers: cors },
-        );
+        res.status(200).json({ messages: [], total: 0, replyCount: 0 });
+        return;
       }
 
       const published = publicMessages(store.messages);
-      return Response.json(
-        {
-          messages: published.slice(offset, offset + limit),
-          total: published.length,
-          replyCount: countReplies(published),
-        },
-        { headers: cors },
-      );
+      res.status(200).json({
+        messages: published.slice(offset, offset + limit),
+        total: published.length,
+        replyCount: countReplies(published),
+      });
+      return;
     }
 
-    if (request.method === 'POST') {
-      const body = await request.json().catch(() => ({}));
+    if (req.method === 'POST') {
+      const body = await readJsonBody(req);
       const action = String(body?.action ?? '');
 
       const ip =
-        request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-        request.headers.get('x-real-ip') ||
+        req.headers?.['x-forwarded-for']?.split(',')[0]?.trim() ||
+        req.headers?.['x-real-ip'] ||
         'unknown';
 
       if (action === 'create') {
@@ -273,18 +309,21 @@ export default async function handler(request) {
         // công như thành công để bot không biết mình đã bị phát hiện.
         if (String(body?.website ?? '').trim()) {
           const store = (await readStore()) ?? { messages: [] };
-          return Response.json(respond('sent', store.messages), { headers: cors });
+          res.status(200).json(respond('sent', store.messages));
+          return;
         }
 
         if (rateLimited(ip)) {
           const store = (await readStore()) ?? { messages: [] };
-          return Response.json(respond('invalid', store.messages), { headers: cors });
+          res.status(200).json(respond('invalid', store.messages));
+          return;
         }
 
         const { error, name, message } = validateCreate(body);
         if (error) {
           const store = (await readStore()) ?? { messages: [] };
-          return Response.json(respond('invalid', store.messages), { headers: cors });
+          res.status(200).json(respond('invalid', store.messages));
+          return;
         }
 
         const store = (await readStore()) ?? { messages: [] };
@@ -302,93 +341,90 @@ export default async function handler(request) {
         store.messages.unshift(entry);
         await writeStore(store.messages);
 
-        return Response.json(respond('sent', store.messages), { headers: cors });
+        res.status(200).json(respond('sent', store.messages));
+        return;
       }
 
       // --- Các hành động của admin ---
 
       if (action === 'reply') {
         const store = await readStore();
-        if (!(await isAdmin(request))) {
-          return Response.json(
-            respond('admin-required', store?.messages ?? []),
-            { headers: cors },
-          );
+        if (!(await isAdmin(req))) {
+          res.status(200).json(respond('admin-required', store?.messages ?? []));
+          return;
         }
 
         const id = String(body?.id ?? '');
         const reply = String(body?.reply ?? '').trim();
         if (!reply || reply.length > 680) {
-          return Response.json(
-            respond('reply-invalid', store?.messages ?? []),
-            { headers: cors },
-          );
+          res.status(200).json(respond('reply-invalid', store?.messages ?? []));
+          return;
         }
 
         const target = store.messages.find((m) => m.id === id);
         if (!target) {
-          return Response.json(respond('reply-invalid', store.messages), { headers: cors });
+          res.status(200).json(respond('reply-invalid', store.messages));
+          return;
         }
 
         target.reply = reply;
         target.repliedAt = new Date().toISOString();
         await writeStore(store.messages);
 
-        return Response.json(respond('replied', store.messages), { headers: cors });
+        res.status(200).json(respond('replied', store.messages));
+        return;
       }
 
       if (action === 'delete-reply') {
         const store = await readStore();
-        if (!(await isAdmin(request))) {
-          return Response.json(
-            respond('admin-required', store?.messages ?? []),
-            { headers: cors },
-          );
+        if (!(await isAdmin(req))) {
+          res.status(200).json(respond('admin-required', store?.messages ?? []));
+          return;
         }
 
         const id = String(body?.id ?? '');
         const target = store.messages.find((m) => m.id === id);
         if (!target) {
-          return Response.json(
-            respond('reply-deleted', store?.messages ?? []),
-            { headers: cors },
-          );
+          res.status(200).json(respond('reply-deleted', store?.messages ?? []));
+          return;
         }
 
         target.reply = null;
         target.repliedAt = null;
         await writeStore(store.messages);
 
-        return Response.json(respond('reply-deleted', store.messages), { headers: cors });
+        res.status(200).json(respond('reply-deleted', store.messages));
+        return;
       }
 
       if (action === 'delete-message') {
         const store = await readStore();
-        if (!(await isAdmin(request))) {
-          return Response.json(
-            respond('admin-required', store?.messages ?? []),
-            { headers: cors },
-          );
+        if (!(await isAdmin(req))) {
+          res.status(200).json(respond('admin-required', store?.messages ?? []));
+          return;
         }
 
         const id = String(body?.id ?? '');
         const before = store.messages.length;
         store.messages = store.messages.filter((m) => m.id !== id);
         if (store.messages.length === before) {
-          return Response.json(respond('message-deleted', store.messages), { headers: cors });
+          res.status(200).json(respond('message-deleted', store.messages));
+          return;
         }
         await writeStore(store.messages);
 
-        return Response.json(respond('message-deleted', store.messages), { headers: cors });
+        res.status(200).json(respond('message-deleted', store.messages));
+        return;
       }
 
       const store = await readStore();
-      return Response.json(respond('invalid', store?.messages ?? []), { headers: cors });
+      res.status(200).json(respond('invalid', store?.messages ?? []));
+      return;
     }
 
-    return new Response('Method Not Allowed', { status: 405, headers: cors });
+    res.status(405).send('Method Not Allowed');
   } catch (e) {
     console.error('guestbook api loi:', e);
-    return new Response('Internal Server Error', { status: 500, headers: cors });
+    res.status(500).send('Internal Server Error');
   }
 }
