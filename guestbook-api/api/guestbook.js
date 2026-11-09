@@ -23,6 +23,7 @@
  *   được giá trị trả về và báo `FUNCTION_INVOCATION_FAILED` — nên toàn bộ
  *   handler dưới đây dùng `req`/`res` của Node.
  */
+import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { get, put } from '@vercel/blob';
 
 export const config = {
@@ -206,7 +207,13 @@ async function isAdmin(req) {
   const blob = await get(ADMIN_KEY_PATH, { access: 'private' }).catch(() => null);
   if (!blob) return false;
 
-  const parsed = JSON.parse(await readBlobText(blob)).catch(() => null);
+  // `JSON.parse` là đồng bộ nên không có `.catch` — phải bọc try/catch.
+  let parsed = null;
+  try {
+    parsed = JSON.parse(await readBlobText(blob));
+  } catch {
+    parsed = null;
+  }
   const expected = parsed?.key;
   if (typeof expected !== 'string' || !expected) return false;
 
@@ -214,7 +221,7 @@ async function isAdmin(req) {
   const a = Buffer.from(expected);
   const b = Buffer.from(provided);
   if (a.length !== b.length) return false;
-  return crypto.timingSafeEqual(a, b);
+  return timingSafeEqual(a, b);
 }
 
 /**
@@ -358,7 +365,7 @@ export default async function handler(req, res) {
 
         const store = (await readStore()) ?? { messages: [] };
         const entry = normalizeMessage({
-          id: crypto.randomUUID(),
+          id: randomUUID(),
           name,
           message,
           reply: null,
