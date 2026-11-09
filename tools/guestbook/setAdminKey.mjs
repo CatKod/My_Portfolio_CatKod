@@ -14,6 +14,7 @@
  *   BLOB_READ_WRITE_TOKEN=... node ../tools/guestbook/setAdminKey.mjs --force <khoá>
  */
 import { get, put } from '@vercel/blob';
+import { readBlobText } from '../lib/blobText.mjs';
 
 const ADMIN_KEY_PATH = 'admin-key.json';
 
@@ -38,7 +39,7 @@ if (!key) {
 
 const existing = await get(ADMIN_KEY_PATH, { access: 'private' }).catch(() => null);
 if (existing && !force) {
-  const current = JSON.parse(await existing.stream.text()).key;
+  const current = JSON.parse(await readBlobText(existing)).key;
   console.log('Da co khoa admin trong store. dung --force de doi.');
   console.log('Khoa hien tai: ' + current);
   process.exit(0);

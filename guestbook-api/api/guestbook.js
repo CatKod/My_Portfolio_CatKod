@@ -33,6 +33,36 @@ export const config = {
 const BLOB_PATH = 'guestbook.json';
 
 /**
+ * Đọc nội dung file trong Vercel Blob thành chuỗi.
+ *
+ * `@vercel/blob` v2 trả về `stream` là `ReadableStream` của Web API (không
+ * phải `Blob` của DOM), nên `blob.stream.text()` không tồn tại và sẽ ném
+ * `TypeError`. Phải đọc qua reader rồi ghép các chunk lại.
+ */
+async function readBlobText(blob) {
+  if (!blob) return '';
+  if (typeof blob.text === 'function') return blob.text();
+
+  const stream = blob.stream;
+  if (!stream) return '';
+
+  if (typeof stream.getReader === 'function') {
+    const reader = stream.getReader();
+    const chunks = [];
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(Buffer.from(value));
+    }
+    return Buffer.concat(chunks).toString('utf8');
+  }
+
+  const chunks = [];
+  for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+  return Buffer.concat(chunks).toString('utf8');
+}
+
+/**
  * Đường dẫn file chứa khoá admin trong Blob.
  *
  * Vì sao không dùng biến môi trường `ADMIN_KEY`?
@@ -128,7 +158,7 @@ async function readStore() {
   const blob = await get(BLOB_PATH, { access: 'private' }).catch(() => null);
   if (!blob) return null;
 
-  const text = await blob.stream.text();
+  const text = await readBlobText(blob);
   const parsed = JSON.parse(text);
   if (!Array.isArray(parsed?.messages)) return null;
 
@@ -176,7 +206,7 @@ async function isAdmin(req) {
   const blob = await get(ADMIN_KEY_PATH, { access: 'private' }).catch(() => null);
   if (!blob) return false;
 
-  const parsed = JSON.parse(await blob.stream.text()).catch(() => null);
+  const parsed = JSON.parse(await readBlobText(blob)).catch(() => null);
   const expected = parsed?.key;
   if (typeof expected !== 'string' || !expected) return false;
 

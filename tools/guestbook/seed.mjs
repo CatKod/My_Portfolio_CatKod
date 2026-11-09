@@ -27,6 +27,7 @@
  */
 import { get, put } from '@vercel/blob';
 import { guestbookMessages } from '../data/guestbook.mjs';
+import { readBlobText } from '../lib/blobText.mjs';
 
 const BLOB_PATH = 'guestbook.json';
 
@@ -43,7 +44,7 @@ const blob = await get(BLOB_PATH, { access: 'private' }).catch(() => null);
 
 let existing = [];
 if (blob) {
-  const parsed = JSON.parse(await blob.stream.text());
+  const parsed = JSON.parse(await readBlobText(blob));
   existing = Array.isArray(parsed?.messages) ? parsed.messages : [];
   console.log('store hien co ' + existing.length + ' loi ghi');
 } else {
@@ -66,11 +67,12 @@ if (missing.length === 0) {
 
 const merged = [
   ...fromGuests,
-  // Giữ nguyên bản trong store (nơi đã có phần trả lời của admin), nhưng sắp
-  // xếp lại theo đúng thứ tự của bản tĩnh.
-  ...guestbookMessages
-    .map((seed) => existing.find((m) => m.id === seed.id))
-    .filter(Boolean),
+  // Sắp xếp lại theo đúng thứ tự của bản tĩnh.
+  // Lời ghi đã có trong store thì giữ nguyên bản (nơi đã có phần trả lời của
+  // admin); lời ghi còn thiếu thì lấy từ bộ seed.
+  ...guestbookMessages.map(
+    (seed) => existing.find((m) => m.id === seed.id) ?? seed,
+  ),
 ];
 
 await put(
